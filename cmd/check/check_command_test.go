@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/henry40408/ssh-shell-resource/internal/models"
+	"github.com/henry40408/ssh-shell-resource/internal"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckCommandReturnDifferentResponse(t *testing.T) {
-	request := models.CheckRequest{}
+	request := internal.CheckRequest{}
 
 	response := CheckCommand(&request)
 	assert.Equal(t, 1, len(response))
@@ -25,8 +25,8 @@ func TestCheckCommandReturnDifferentResponse(t *testing.T) {
 }
 
 func TestCheckCommandReturnPreviousVersion(t *testing.T) {
-	version := models.Version{Timestamp: time.Now()}
-	request := models.CheckRequest{Version: version}
+	version := internal.Version{Timestamp: time.Now()}
+	request := internal.CheckRequest{Version: version}
 
 	time.Sleep(1 * time.Millisecond)
 
@@ -39,8 +39,8 @@ func TestCheckCommandReturnPreviousVersion(t *testing.T) {
 }
 
 func TestCheckCommandResponseTimeIsGreaterThanRequestTime(t *testing.T) {
-	version := models.Version{Timestamp: time.Now()}
-	request := models.CheckRequest{Version: version}
+	version := internal.Version{Timestamp: time.Now()}
+	request := internal.CheckRequest{Version: version}
 
 	time.Sleep(1 * time.Millisecond)
 

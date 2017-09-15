@@ -1,33 +1,26 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
-	"github.com/henry40408/ssh-shell-resource/internal/models"
+	"github.com/henry40408/ssh-shell-resource/internal"
 	"github.com/spacemonkeygo/errors"
 )
 
-var (
-	CheckError       = errors.NewClass("CheckError")
-	InvalidJSONError = errors.NewClass("InvalidJSONError")
-	OutputError      = errors.NewClass("OutputError")
-)
-
 func Main(stdin, stdout *os.File) error {
-	var request models.CheckRequest
+	var request internal.CheckRequest
 
-	err := json.NewDecoder(stdin).Decode(&request)
+	err := internal.NewRequestFromStdin(stdin, &request)
 	if err != nil {
-		return InvalidJSONError.New("stdin is not a valid JSON")
+		return err
 	}
 
 	response := CheckCommand(&request)
 
-	err = json.NewEncoder(stdout).Encode(&response)
+	err = internal.RespondToStdout(stdout, &response)
 	if err != nil {
-		return OutputError.New("unable to output JSON")
+		return err
 	}
 
 	return nil
