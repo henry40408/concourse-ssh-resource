@@ -11,7 +11,7 @@ import (
 func Main(stdin, stdout *os.File) error {
 	var request internal.CheckRequest
 
-	err := internal.NewRequestFromStdin(stdin, &request)
+	err := internal.NewRequestFromStdin(stdin, &request.Request)
 	if err != nil {
 		return err
 	}

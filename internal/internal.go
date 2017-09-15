@@ -13,14 +13,6 @@ var (
 	OutputError      = errors.NewClass("OutputError")
 )
 
-type CheckRequest struct {
-	Source  Source  `json:"source"`
-	Version Version `json:"version"`
-	Params  Params  `json:"params"`
-}
-
-type CheckResponse []Version
-
 type Source struct {
 	Host       string  `json:"host"`
 	Port       float64 `json:"port"`
@@ -37,7 +29,7 @@ type Params struct {
 	Script string `json:"script"`
 }
 
-func NewRequestFromStdin(stdin *os.File, request *CheckRequest) error {
+func NewRequestFromStdin(stdin *os.File, request *Request) error {
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
 		return InvalidJSONError.New("stdin is not a valid JSON")
@@ -45,7 +37,7 @@ func NewRequestFromStdin(stdin *os.File, request *CheckRequest) error {
 	return nil
 }
 
-func RespondToStdout(stdout *os.File, response *CheckResponse) error {
+func RespondToStdout(stdout *os.File, response interface{}) error {
 	err := json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
 		return OutputError.New("unable to output JSON")

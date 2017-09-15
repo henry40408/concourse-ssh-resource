@@ -9,7 +9,7 @@ import (
 func CheckCommand(request *internal.CheckRequest) internal.CheckResponse {
 	versions := internal.CheckResponse{}
 
-	previousVersion := request.Version
+	previousVersion := request.Request.Version
 	if !previousVersion.Timestamp.IsZero() {
 		versions = append(versions, previousVersion)
 	}

@@ -26,7 +26,9 @@ func TestCheckCommandReturnDifferentResponse(t *testing.T) {
 
 func TestCheckCommandReturnPreviousVersion(t *testing.T) {
 	version := internal.Version{Timestamp: time.Now()}
-	request := internal.CheckRequest{Version: version}
+	request := internal.CheckRequest{
+		Request: internal.Request{Version: version},
+	}
 
 	time.Sleep(1 * time.Millisecond)
 
@@ -40,7 +42,9 @@ func TestCheckCommandReturnPreviousVersion(t *testing.T) {
 
 func TestCheckCommandResponseTimeIsGreaterThanRequestTime(t *testing.T) {
 	version := internal.Version{Timestamp: time.Now()}
-	request := internal.CheckRequest{Version: version}
+	request := internal.CheckRequest{
+		Request: internal.Request{Version: version},
+	}
 
 	time.Sleep(1 * time.Millisecond)
 
