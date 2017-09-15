@@ -9,7 +9,7 @@ import (
 )
 
 func TestCheckCommandReturnDifferentResponse(t *testing.T) {
-	request := internal.CheckRequest{}
+	request := CheckRequest{}
 
 	response := CheckCommand(&request)
 	assert.Equal(t, 1, len(response))
@@ -26,7 +26,7 @@ func TestCheckCommandReturnDifferentResponse(t *testing.T) {
 
 func TestCheckCommandReturnPreviousVersion(t *testing.T) {
 	version := internal.Version{Timestamp: time.Now()}
-	request := internal.CheckRequest{
+	request := CheckRequest{
 		Request: internal.Request{Version: version},
 	}
 
@@ -42,7 +42,7 @@ func TestCheckCommandReturnPreviousVersion(t *testing.T) {
 
 func TestCheckCommandResponseTimeIsGreaterThanRequestTime(t *testing.T) {
 	version := internal.Version{Timestamp: time.Now()}
-	request := internal.CheckRequest{
+	request := CheckRequest{
 		Request: internal.Request{Version: version},
 	}
 

@@ -6,8 +6,8 @@ import (
 	"github.com/henry40408/ssh-shell-resource/internal"
 )
 
-func CheckCommand(request *internal.CheckRequest) internal.CheckResponse {
-	versions := internal.CheckResponse{}
+func CheckCommand(request *CheckRequest) CheckResponse {
+	versions := CheckResponse{}
 
 	previousVersion := request.Request.Version
 	if !previousVersion.Timestamp.IsZero() {
