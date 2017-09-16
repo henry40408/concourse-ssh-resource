@@ -1,4 +1,4 @@
-.PHONY: build build_in_docker
+.PHONY: build build_in_docker test
 
 BUILD_ARGS=--ldflags "-s -w"
 
@@ -11,3 +11,8 @@ build_in_docker:
 	go build $(BUILD_ARGS) -o /assets/check github.com/henry40408/ssh-shell-resource/cmd/check
 	go build $(BUILD_ARGS) -o /assets/in github.com/henry40408/ssh-shell-resource/cmd/in
 	go build $(BUILD_ARGS) -o /assets/out github.com/henry40408/ssh-shell-resource/cmd/out
+
+test:
+	go test github.com/henry40408/ssh-shell-resource/cmd/check
+	go test github.com/henry40408/ssh-shell-resource/cmd/in
+	go test github.com/henry40408/ssh-shell-resource/cmd/out
