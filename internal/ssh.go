@@ -2,13 +2,13 @@ package internal
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"strconv"
 
 	easyssh "github.com/appleboy/easyssh-proxy"
 )
 
-func PerformSSHCommand(request *Request, stdout, stderr *os.File) error {
+func PerformSSHCommand(request *Request, stdout, stderr io.Writer) error {
 	source := request.Source
 	config := &easyssh.MakeConfig{
 		Server:   source.Host,

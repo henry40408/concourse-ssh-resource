@@ -8,6 +8,7 @@ import (
 type MockIO struct {
 	In  *os.File
 	Out *os.File
+	Err *os.File
 }
 
 func NewMockIO(content []byte) (*MockIO, error) {
@@ -27,10 +28,16 @@ func NewMockIO(content []byte) (*MockIO, error) {
 		return nil, err
 	}
 
-	return &MockIO{In: in, Out: out}, nil
+	stdErr, err := ioutil.TempFile(os.TempDir(), "stderr")
+	if err != nil {
+		return nil, err
+	}
+
+	return &MockIO{In: in, Out: out, Err: stdErr}, nil
 }
 
 func (m *MockIO) Cleanup() {
 	os.Remove(m.In.Name())
 	os.Remove(m.Out.Name())
+	os.Remove(m.Err.Name())
 }
