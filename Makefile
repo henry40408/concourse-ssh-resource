@@ -8,9 +8,9 @@ build:
 	go build $(BUILD_ARGS) -o out cmd/out
 
 build_in_docker:
-	go build $(BUILD_ARGS) -o /assets/check github.com/henry40408/ssh-shell-resource/cmd/check
-	go build $(BUILD_ARGS) -o /assets/in github.com/henry40408/ssh-shell-resource/cmd/in
-	go build $(BUILD_ARGS) -o /assets/out github.com/henry40408/ssh-shell-resource/cmd/out
+	go build $(BUILD_ARGS) -o /opt/resource/check github.com/henry40408/ssh-shell-resource/cmd/check
+	go build $(BUILD_ARGS) -o /opt/resource/in github.com/henry40408/ssh-shell-resource/cmd/in
+	go build $(BUILD_ARGS) -o /opt/resource/out github.com/henry40408/ssh-shell-resource/cmd/out
 
 test:
 	go test github.com/henry40408/ssh-shell-resource/cmd/check
