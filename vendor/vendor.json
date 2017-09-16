@@ -3,10 +3,28 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "YIxEdL0eLu3PL7SPG5NvqX3mFY0=",
+			"path": "github.com/appleboy/easyssh-proxy",
+			"revision": "b777a323265704a7015f3526c3fe31b4f0daa722",
+			"revisionTime": "2017-06-19T08:59:07Z"
+		},
+		{
+			"checksumSHA1": "3ot05ECs2ot4H5v3ul1dKoTWozA=",
+			"path": "github.com/corpix/uarand",
+			"revision": "2b8494104d86337cdd41d0a49cbed8e4583c0ab4",
+			"revisionTime": "2017-09-03T19:08:22Z"
+		},
+		{
 			"checksumSHA1": "mrz/kicZiUaHxkyfvC/DyQcr8Do=",
 			"path": "github.com/davecgh/go-spew/spew",
 			"revision": "a476722483882dd40b8111f0eb64e1d7f43f56e4",
 			"revisionTime": "2017-08-29T19:49:58Z"
+		},
+		{
+			"checksumSHA1": "vrYJBnqzBJBmCmiVPgCLwxuBCmc=",
+			"path": "github.com/icrowley/fake",
+			"revision": "e64cc2cf92049a299f359734c6ea76073f2a8b2c",
+			"revisionTime": "2017-07-23T15:10:11Z"
 		},
 		{
 			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
@@ -49,6 +67,36 @@
 			"path": "github.com/stretchr/testify/mock",
 			"revision": "890a5c3458b43e6104ff5da8dfa139d013d77544",
 			"revisionTime": "2017-07-05T02:17:15Z"
+		},
+		{
+			"checksumSHA1": "IQkUIOnvlf0tYloFx9mLaXSvXWQ=",
+			"path": "golang.org/x/crypto/curve25519",
+			"revision": "b0c9c05bfe149df95eb1d25642162cca051e0466",
+			"revisionTime": "2017-09-15T01:37:37Z"
+		},
+		{
+			"checksumSHA1": "X6Q8nYb+KXh+64AKHwWOOcyijHQ=",
+			"path": "golang.org/x/crypto/ed25519",
+			"revision": "b0c9c05bfe149df95eb1d25642162cca051e0466",
+			"revisionTime": "2017-09-15T01:37:37Z"
+		},
+		{
+			"checksumSHA1": "LXFcVx8I587SnWmKycSDEq9yvK8=",
+			"path": "golang.org/x/crypto/ed25519/internal/edwards25519",
+			"revision": "b0c9c05bfe149df95eb1d25642162cca051e0466",
+			"revisionTime": "2017-09-15T01:37:37Z"
+		},
+		{
+			"checksumSHA1": "yPCMw2UX8Jad4GNWSwo8QgZS6TY=",
+			"path": "golang.org/x/crypto/ssh",
+			"revision": "b0c9c05bfe149df95eb1d25642162cca051e0466",
+			"revisionTime": "2017-09-15T01:37:37Z"
+		},
+		{
+			"checksumSHA1": "ujKeyWHFOYmXm5IgAxfyFCGefsY=",
+			"path": "golang.org/x/crypto/ssh/agent",
+			"revision": "b0c9c05bfe149df95eb1d25642162cca051e0466",
+			"revisionTime": "2017-09-15T01:37:37Z"
 		},
 		{
 			"checksumSHA1": "dr5+PfIRzXeN+l1VG+s0lea9qz8=",

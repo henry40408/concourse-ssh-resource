@@ -9,11 +9,11 @@ type Request struct {
 }
 
 type Source struct {
-	Host       string  `json:"host"`
-	Port       float64 `json:"port"`
-	User       string  `json:"user"`
-	Password   string  `json:"password"`
-	PrivateKey string  `json:"private_key"`
+	Host       string `json:"host"`
+	Port       int    `json:"port"`
+	User       string `json:"user"`
+	Password   string `json:"password"`
+	PrivateKey string `json:"private_key"`
 }
 
 type Version struct {

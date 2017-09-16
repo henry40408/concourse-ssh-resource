@@ -1,21 +1,14 @@
 package main
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/henry40408/ssh-shell-resource/internal"
+	"github.com/henry40408/ssh-shell-resource/pkg/mockio"
 	"github.com/spacemonkeygo/errors"
 	"github.com/stretchr/testify/assert"
 )
-
-type MockStdio struct {
-	In    *os.File
-	Out   *os.File
-	Error error
-}
 
 func TestCheckCommandReturnDifferentResponse(t *testing.T) {
 	request := CheckRequest{}
@@ -65,47 +58,25 @@ func TestCheckCommandResponseTimeIsGreaterThanRequestTime(t *testing.T) {
 }
 
 func TestMain(t *testing.T) {
-	stdio, err := NewMockStdio()
+	mockio, err := mockio.NewMockIO([]byte("{}"))
 	if err != nil {
 		t.Error(err)
 	}
-	defer stdio.Cleanup()
+	defer mockio.Cleanup()
 
-	stdio.In.WriteString("{}")
-	stdio.In.Seek(0, 0)
-
-	err = Main(stdio.In, stdio.Out)
+	err = Main(mockio.In, mockio.Out)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestMainNotValidJSON(t *testing.T) {
-	stdio, err := NewMockStdio()
+	mockio, err := mockio.NewMockIO([]byte(""))
 	if err != nil {
 		t.Error(err)
 	}
-	defer stdio.Cleanup()
+	defer mockio.Cleanup()
 
-	err = Main(stdio.In, stdio.Out)
-	assert.Equal(t, errors.GetMessage(err), "InvalidJSONError: stdin is not a valid JSON")
-}
-
-func NewMockStdio() (*MockStdio, error) {
-	stdin, err := ioutil.TempFile(os.TempDir(), "stdin")
-	if err != nil {
-		return nil, err
-	}
-
-	stdout, err := ioutil.TempFile(os.TempDir(), "stdout")
-	if err != nil {
-		return nil, err
-	}
-
-	return &MockStdio{In: stdin, Out: stdout}, nil
-}
-
-func (m *MockStdio) Cleanup() {
-	os.Remove(m.In.Name())
-	os.Remove(m.Out.Name())
+	err = Main(mockio.In, mockio.Out)
+	assert.Equal(t, "InvalidJSONError: stdin is not a valid JSON", errors.GetMessage(err))
 }
