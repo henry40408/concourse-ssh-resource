@@ -4,6 +4,8 @@
 
 ## Source Configuration
 
+*TBD*
+
 ## Behavior
 
 ### `check`: Dump current timestamp and do nothing
