@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strconv"
 
-	easyssh "github.com/appleboy/easyssh-proxy"
 	"github.com/henry40408/ssh-shell-resource/internal"
 	"github.com/spacemonkeygo/errors"
 )
@@ -31,25 +29,6 @@ func Main(stdin, stdout *os.File, args []string) error {
 		return err
 	}
 
-	source := request.Request.Source
-	config := &easyssh.MakeConfig{
-		Server:   source.Host,
-		Port:     "22",
-		User:     source.User,
-		Password: source.Password,
-		Key:      source.PrivateKey,
-	}
-
-	if source.Port != 0 {
-		config.Port = strconv.Itoa(source.Port)
-	}
-
-	params := request.Request.Params
-	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(params.Script, SSHTimeout)
-	if err != nil {
-		return internal.SSHError.New("failed to run command: %s", err.Error())
-	}
-
 	baseDir := args[1]
 
 	outFile, err := os.OpenFile(path.Join(baseDir, "stdout"), os.O_RDWR|os.O_CREATE, 0644)
@@ -64,27 +43,9 @@ func Main(stdin, stdout *os.File, args []string) error {
 		return internal.FileError.New("failed to create file for SSH stderr: %s", err.Error())
 	}
 
-	done := true
-
-loop:
-	for {
-		select {
-		case done = <-doneChan:
-			break loop
-		case outline := <-stdoutChan:
-			outFile.WriteString(outline)
-		case errline := <-stderrChan:
-			errFile.WriteString(errline)
-		case err = <-errChan:
-		}
-	}
-
+	err = internal.PerformSSHCommand(&request.Request, outFile, errFile)
 	if err != nil {
-		return internal.SSHError.New("failed when running SSH command: %s", err.Error())
-	}
-
-	if !done {
-		return internal.TimeoutError.New("SSH command times out")
+		return err
 	}
 
 	return nil
