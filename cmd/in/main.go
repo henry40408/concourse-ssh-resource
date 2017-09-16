@@ -13,18 +13,14 @@ const (
 	SSHTimeout = 10 * 60 // = 10 minutes
 )
 
-type InRequest struct {
-	Request internal.Request
-}
-
 func Main(stdin, stdout *os.File, args []string) error {
-	var request InRequest
+	var request internal.Request
 
 	if len(args) < 2 {
 		return internal.ArgumentError.New("need at least one argument")
 	}
 
-	err := internal.NewRequestFromStdin(stdin, &request.Request)
+	err := internal.NewRequestFromStdin(stdin, &request)
 	if err != nil {
 		return err
 	}
@@ -43,7 +39,7 @@ func Main(stdin, stdout *os.File, args []string) error {
 		return internal.FileError.New("failed to create file for SSH stderr: %s", err.Error())
 	}
 
-	err = internal.PerformSSHCommand(&request.Request, outFile, errFile)
+	err = internal.PerformSSHCommand(&request, outFile, errFile)
 	if err != nil {
 		return err
 	}
