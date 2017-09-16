@@ -1,0 +1,24 @@
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/github.com/henry40408/ssh-shell-resource
+    docker:
+      - image: circleci/golang:1.9
+      - image: quay.io/henry40408/alpine-ssh:v1.0.0
+    steps:
+      - checkout
+      - run:
+          name: install-govendor
+          command: go get -u github.com/kardianos/govendor
+      - restore_cache:
+          key: dependency-cache-{{ checksum "vendor/vendor.json" }}
+      - run:
+          name: install-dependencies
+          command: govendor sync
+      - save_cache:
+          key: dependency-cache-{{ checksum "vendor/vendor.json" }}
+          paths:
+            - ./vendor
+      - run:
+          name: test
+          command: make test
