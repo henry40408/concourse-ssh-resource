@@ -15,13 +15,6 @@ const (
 	SSHTimeout = 10 * 60 // = 10 minutes
 )
 
-var (
-	ArgumentError = errors.NewClass("ArgumentError")
-	FileError     = errors.NewClass("FileError")
-	SSHError      = errors.NewClass("SSHError")
-	TimeoutError  = errors.NewClass("TimeoutError")
-)
-
 type InRequest struct {
 	Request internal.Request
 }
@@ -30,7 +23,7 @@ func Main(stdin, stdout *os.File, args []string) error {
 	var request InRequest
 
 	if len(args) < 2 {
-		return ArgumentError.New("need at least one argument")
+		return internal.ArgumentError.New("need at least one argument")
 	}
 
 	err := internal.NewRequestFromStdin(stdin, &request.Request)
@@ -54,7 +47,7 @@ func Main(stdin, stdout *os.File, args []string) error {
 	params := request.Request.Params
 	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(params.Script, SSHTimeout)
 	if err != nil {
-		return SSHError.New("failed to run command: %s", err.Error())
+		return internal.SSHError.New("failed to run command: %s", err.Error())
 	}
 
 	baseDir := args[1]
@@ -62,13 +55,13 @@ func Main(stdin, stdout *os.File, args []string) error {
 	outFile, err := os.OpenFile(path.Join(baseDir, "stdout"), os.O_RDWR|os.O_CREATE, 0644)
 	defer outFile.Close()
 	if err != nil {
-		return FileError.New("failed to create file for SSH stdout: %s", err.Error())
+		return internal.FileError.New("failed to create file for SSH stdout: %s", err.Error())
 	}
 
 	errFile, err := os.OpenFile(path.Join(baseDir, "stderr"), os.O_RDWR|os.O_CREATE, 0644)
 	defer errFile.Close()
 	if err != nil {
-		return FileError.New("failed to create file for SSH stderr: %s", err.Error())
+		return internal.FileError.New("failed to create file for SSH stderr: %s", err.Error())
 	}
 
 	done := true
@@ -87,11 +80,11 @@ loop:
 	}
 
 	if err != nil {
-		return SSHError.New("failed when running SSH command: %s", err.Error())
+		return internal.SSHError.New("failed when running SSH command: %s", err.Error())
 	}
 
 	if !done {
-		return TimeoutError.New("SSH command is timeout")
+		return internal.TimeoutError.New("SSH command times out")
 	}
 
 	return nil

@@ -137,7 +137,7 @@ func TestMainFailToRunSSHCommand(t *testing.T) {
 	}
 
 	err = Main(mockio.In, mockio.Out, args)
-	assert.Equal(t, SSHError, errors.GetClass(err))
+	assert.Equal(t, internal.SSHError, errors.GetClass(err))
 }
 
 func stdoutFile() (*os.File, error) {
