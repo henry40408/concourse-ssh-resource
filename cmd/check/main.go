@@ -1,45 +1,41 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
 	"github.com/henry40408/ssh-shell-resource/internal"
-	"github.com/spacemonkeygo/errors"
 )
 
 type CheckRequest struct {
-	internal.Request
+	Source  internal.Source  `json:"source"`
+	Version internal.Version `json:"version"`
 }
 
 type CheckResponse []internal.Version
 
-func CheckCommand(request *CheckRequest) CheckResponse {
-	versions := CheckResponse{}
-
-	previousVersion := request.Request.Version
-	if !previousVersion.Timestamp.IsZero() {
-		versions = append(versions, previousVersion)
-	}
-
-	versions = append(versions, internal.Version{Timestamp: time.Now()})
-	return versions
-}
-
-func Main(stdin, stdout *os.File) error {
+func Main(stdin io.Reader, stdout io.Writer) error {
 	var request CheckRequest
 
-	err := internal.NewRequestFromStdin(stdin, &request.Request)
+	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to parse JSON from stdin: %s", err.Error())
 	}
 
-	response := CheckCommand(&request)
+	response := make(CheckResponse, 0)
+	if !request.Version.Timestamp.IsZero() {
+		response = append(response, request.Version)
+	}
+	response = append(response, internal.Version{
+		Timestamp: time.Now().Round(1 * time.Second),
+	})
 
-	err = internal.RespondToStdout(stdout, &response)
+	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to dump JSON to stdout: %s", err.Error())
 	}
 
 	return nil
@@ -48,7 +44,7 @@ func Main(stdin, stdout *os.File) error {
 func main() {
 	err := Main(os.Stdin, os.Stdout)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, errors.GetMessage(err))
+		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 }

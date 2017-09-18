@@ -2,12 +2,6 @@ package internal
 
 import "time"
 
-type Request struct {
-	Source  Source  `json:"source"`
-	Version Version `json:"version"`
-	Params  Params  `json:"params"`
-}
-
 type Source struct {
 	Host       string `json:"host"`
 	Port       int    `json:"port"`
@@ -22,4 +16,9 @@ type Version struct {
 
 type Params struct {
 	Script string `json:"script"`
+}
+
+type Metadata struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }

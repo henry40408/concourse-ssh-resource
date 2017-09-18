@@ -1,45 +1,68 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
 	"github.com/henry40408/ssh-shell-resource/internal"
-	"github.com/spacemonkeygo/errors"
 )
 
-func Main(stdin, stdout, stderr *os.File) error {
-	var request internal.Request
+type OutRequest struct {
+	Params internal.Params `json:"params"`
+	Source internal.Source `json:"source"`
+}
 
-	err := internal.NewRequestFromStdin(stdin, &request)
+type OutResponse struct {
+	Version  internal.Version    `json:"version"`
+	Metadata []internal.Metadata `json:"metadata"`
+}
+
+type prefixWriter struct {
+	prefix string
+	writer io.Writer
+}
+
+func (pw *prefixWriter) Write(p []byte) (n int, err error) {
+	return fmt.Fprintf(pw.writer, "%s: %s", pw.prefix, p)
+}
+
+func Main(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
+	var request OutRequest
+
+	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to parse JSON from stdin: %s", err.Error())
 	}
 
-	outWriter := internal.PrefixWriter{
-		Writer: stderr,
-		Prefix: "stdout",
+	stdoutWriter := &prefixWriter{
+		prefix: "stdout",
+		writer: stderr,
 	}
 
-	errWriter := internal.PrefixWriter{
-		Writer: stderr,
-		Prefix: "stderr",
+	stderrWriter := &prefixWriter{
+		prefix: "stderr",
+		writer: stderr,
 	}
 
-	err = internal.PerformSSHCommand(&request, &outWriter, &errWriter)
+	err = internal.PerformSSHCommand(&request.Source, &request.Params, stdoutWriter, stderrWriter)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to run SSH command: %s", err.Error())
 	}
 
-	response := internal.Request{
+	metadataItems := make([]internal.Metadata, 0)
+	response := OutResponse{
 		Version: internal.Version{
-			Timestamp: time.Now(),
+			Timestamp: time.Now().Round(1 * time.Second),
 		},
+		Metadata: metadataItems,
 	}
-	err = internal.RespondToStdout(stdout, &response)
+
+	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to dump JSON to stdout: %s", err.Error())
 	}
 
 	return nil
@@ -48,7 +71,7 @@ func Main(stdin, stdout, stderr *os.File) error {
 func main() {
 	err := Main(os.Stdin, os.Stdout, os.Stderr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, errors.GetMessage(err))
+		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 }
