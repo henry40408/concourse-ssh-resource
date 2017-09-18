@@ -19,6 +19,8 @@ echo "%s"
 `
 
 func TestMain(t *testing.T) {
+	var response internal.Request
+
 	words := fake.WordsN(3)
 	request := internal.Request{
 		Source: internal.Source{
@@ -57,4 +59,17 @@ func TestMain(t *testing.T) {
 
 	expected := fmt.Sprintf("stdout: %s", words)
 	assert.Equal(t, expected, string(errContent))
+
+	mockio.Out.Seek(0, 0)
+	responseJSON, err := ioutil.ReadAll(mockio.Out)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = json.Unmarshal(responseJSON, &response)
+	if err != nil {
+		t.Error(err)
+	}
+
+	assert.False(t, response.Version.Timestamp.IsZero())
 }
