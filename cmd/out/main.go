@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/henry40408/ssh-shell-resource/internal"
 	"github.com/spacemonkeygo/errors"
@@ -27,6 +28,16 @@ func Main(stdin, stdout, stderr *os.File) error {
 	}
 
 	err = internal.PerformSSHCommand(&request, &outWriter, &errWriter)
+	if err != nil {
+		return err
+	}
+
+	response := internal.Request{
+		Version: internal.Version{
+			Timestamp: time.Now(),
+		},
+	}
+	err = internal.RespondToStdout(stdout, &response)
 	if err != nil {
 		return err
 	}
