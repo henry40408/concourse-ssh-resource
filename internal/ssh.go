@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -8,8 +9,9 @@ import (
 	easyssh "github.com/appleboy/easyssh-proxy"
 )
 
-func PerformSSHCommand(request *Request, stdout, stderr io.Writer) error {
-	source := request.Source
+const DefaultTimeout = 60 * 10 // = 10 minutes
+
+func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer) error {
 	config := &easyssh.MakeConfig{
 		Server:   source.Host,
 		Port:     "22",
@@ -22,10 +24,9 @@ func PerformSSHCommand(request *Request, stdout, stderr io.Writer) error {
 		config.Port = strconv.Itoa(source.Port)
 	}
 
-	params := request.Params
-	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(params.Script, SSHTimeout)
+	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(params.Script, DefaultTimeout)
 	if err != nil {
-		return SSHError.New("failed to run command: %s", err.Error())
+		return fmt.Errorf("failed to run command: %s", err.Error())
 	}
 
 	done := true
@@ -44,11 +45,11 @@ loop:
 	}
 
 	if err != nil {
-		return SSHError.New("failed when running SSH command: %s", err.Error())
+		return fmt.Errorf("failed when running SSH command: %s", err.Error())
 	}
 
 	if !done {
-		return TimeoutError.New("SSH command times out")
+		return errors.New("SSH command times out")
 	}
 
 	return nil

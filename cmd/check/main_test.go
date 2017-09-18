@@ -1,82 +1,76 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/henry40408/ssh-shell-resource/internal"
-	"github.com/henry40408/ssh-shell-resource/pkg/mockio"
-	"github.com/spacemonkeygo/errors"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCheckCommandReturnDifferentResponse(t *testing.T) {
-	request := CheckRequest{}
+func TestMainWithEmptyVersion(t *testing.T) {
+	var response CheckResponse
 
-	response := CheckCommand(&request)
-	assert.Equal(t, 1, len(response))
+	stdout, err := ioutil.TempFile(os.TempDir(), "stdout")
+	handleError(t, err)
+	defer stdout.Close()
 
-	time.Sleep(1 * time.Millisecond)
+	stdin := strings.NewReader(`{ "source": {}, "version": {} }`)
 
-	anotherResponse := CheckCommand(&request)
-	assert.Equal(t, 1, len(anotherResponse))
+	err = Main(stdin, stdout)
+	handleError(t, err)
 
-	responseTime := response[0].Timestamp.UnixNano()
-	anotherResponseTime := anotherResponse[0].Timestamp.UnixNano()
-	assert.NotEqual(t, responseTime, anotherResponseTime)
+	stdout.Seek(0, 0)
+	stdoutContent, err := ioutil.ReadAll(stdout)
+	handleError(t, err)
+
+	fmt.Printf(string(stdoutContent))
+
+	err = json.Unmarshal(stdoutContent, &response)
+	handleError(t, err)
+
+	assert.False(t, response[0].Timestamp.IsZero())
 }
 
-func TestCheckCommandReturnPreviousVersion(t *testing.T) {
-	version := internal.Version{Timestamp: time.Now()}
-	request := CheckRequest{
-		Request: internal.Request{Version: version},
-	}
+func TestMainWithVersion(t *testing.T) {
+	var response CheckResponse
 
-	time.Sleep(1 * time.Millisecond)
+	previousVersion := time.Now().Add(-1 * time.Second)
 
-	response := CheckCommand(&request)
+	stdout, err := ioutil.TempFile(os.TempDir(), "stdout")
+	handleError(t, err)
+	defer stdout.Close()
+
+	stdin := strings.NewReader(fmt.Sprintf(`{
+		"source": {},
+		"version": {
+			"time": "%s"
+		}
+	}`, previousVersion.Format(time.RFC3339)))
+
+	err = Main(stdin, stdout)
+	handleError(t, err)
+
+	stdout.Seek(0, 0)
+	stdoutContent, err := ioutil.ReadAll(stdout)
+	handleError(t, err)
+
+	fmt.Printf(string(stdoutContent))
+
+	err = json.Unmarshal(stdoutContent, &response)
+	handleError(t, err)
+
 	assert.Equal(t, 2, len(response))
-
-	requestTime := request.Version.Timestamp.UnixNano()
-	responseTime := response[0].Timestamp.UnixNano()
-	assert.Equal(t, requestTime, responseTime)
+	assert.Equal(t, previousVersion.Unix(), response[0].Timestamp.Unix())
+	assert.True(t, response[1].Timestamp.After(previousVersion))
 }
 
-func TestCheckCommandResponseTimeIsGreaterThanRequestTime(t *testing.T) {
-	version := internal.Version{Timestamp: time.Now()}
-	request := CheckRequest{
-		Request: internal.Request{Version: version},
-	}
-
-	time.Sleep(1 * time.Millisecond)
-
-	response := CheckCommand(&request)
-
-	requestTime := request.Version.Timestamp.UnixNano()
-	responseTime := response[1].Timestamp.UnixNano()
-	assert.True(t, responseTime > requestTime)
-}
-
-func TestMain(t *testing.T) {
-	mockio, err := mockio.NewMockIO([]byte("{}"))
+func handleError(t *testing.T, err error) {
 	if err != nil {
 		t.Error(err)
 	}
-	defer mockio.Cleanup()
-
-	err = Main(mockio.In, mockio.Out)
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-func TestMainNotValidJSON(t *testing.T) {
-	mockio, err := mockio.NewMockIO([]byte(""))
-	if err != nil {
-		t.Error(err)
-	}
-	defer mockio.Cleanup()
-
-	err = Main(mockio.In, mockio.Out)
-	assert.Equal(t, "InvalidJSONError: stdin is not a valid JSON", errors.GetMessage(err))
 }
