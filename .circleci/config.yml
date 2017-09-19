@@ -8,17 +8,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install-govendor
+          name: Install govendor
           command: go get -u github.com/kardianos/govendor
       - restore_cache:
           key: dependency-cache-{{ checksum "vendor/vendor.json" }}
       - run:
-          name: install-dependencies
+          name: Install Dependencies
           command: govendor sync
       - save_cache:
           key: dependency-cache-{{ checksum "vendor/vendor.json" }}
           paths:
             - ./vendor
       - run:
-          name: test
+          name: Test
           command: make test
