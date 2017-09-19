@@ -1,5 +1,7 @@
 package internal
 
+import "time"
+
 type Source struct {
 	Host       string `json:"host"`
 	Port       int    `json:"port"`
@@ -8,7 +10,9 @@ type Source struct {
 	PrivateKey string `json:"private_key"`
 }
 
-type Version struct{}
+type Version struct {
+	Timestamp time.Time `json:"time"`
+}
 
 type Params struct {
 	Script string `json:"script"`
