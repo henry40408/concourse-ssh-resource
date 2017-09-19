@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,12 +10,11 @@ import (
 	"github.com/icrowley/fake"
 
 	"github.com/henry40408/ssh-shell-resource/internal"
+	"github.com/henry40408/ssh-shell-resource/pkg/mockio"
 )
 
 func TestMain(t *testing.T) {
 	var response OutResponse
-
-	tempDir := os.TempDir()
 
 	words := fake.WordsN(3)
 	request := OutRequest{
@@ -38,24 +34,16 @@ echo "%s"
 	requestJSON, err := json.Marshal(&request)
 	handleError(t, err)
 
-	stdin := bytes.NewReader(requestJSON)
-
-	stderr, err := ioutil.TempFile(tempDir, "stderr")
+	io, err := mockio.NewMockIO(requestJSON)
 	handleError(t, err)
-	defer stderr.Close()
+	defer io.Cleanup()
 
-	stdout, err := ioutil.TempFile(tempDir, "stdout")
-	handleError(t, err)
-	defer stdout.Close()
-
-	err = Main(stdin, stdout, stderr)
+	err = Main(io.In, io.Out, io.Err)
 	handleError(t, err)
 
 	// test stdout
-	stdout.Seek(0, 0)
-	stdoutContent, err := ioutil.ReadAll(stdout)
+	stdoutContent, err := io.ReadAll(mockio.OUT)
 	handleError(t, err)
-
 	fmt.Printf(string(stdoutContent))
 
 	err = json.Unmarshal(stdoutContent, &response)
@@ -65,8 +53,7 @@ echo "%s"
 	assert.Equal(t, 0, len(response.Metadata))
 
 	// test stderr
-	stderr.Seek(0, 0)
-	stderrContent, err := ioutil.ReadAll(stderr)
+	stderrContent, err := io.ReadAll(mockio.ERR)
 	handleError(t, err)
 
 	assert.Equal(t, fmt.Sprintf("stdout: %s", words), string(stderrContent))
