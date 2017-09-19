@@ -40,9 +40,9 @@ loop:
 		case done = <-doneChan:
 			break loop
 		case outline := <-stdoutChan:
-			fmt.Fprintf(stdout, outline)
+			fmt.Fprintf(stdout, "%s\n", outline)
 		case errline := <-stderrChan:
-			fmt.Fprintf(stderr, errline)
+			fmt.Fprintf(stderr, "%s\n", errline)
 		case err = <-errChan:
 		}
 	}
