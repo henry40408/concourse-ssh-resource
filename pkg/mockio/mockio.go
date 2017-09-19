@@ -7,9 +7,12 @@ import (
 )
 
 const (
-	IN  = 1
-	OUT = 2
-	ERR = 4
+	// IN represents imitated stdin
+	IN = 1 << iota
+	// OUT represents imitated stdout
+	OUT = 1 << iota
+	// ERR represents imitated stderr
+	ERR = 1 << iota
 )
 
 // MockIO holds three file to imitate stdin, stdout, and stderr
