@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
 
 	"github.com/henry40408/ssh-shell-resource/internal"
 )
@@ -18,22 +17,8 @@ type CheckRequest struct {
 type CheckResponse []internal.Version
 
 func Main(stdin io.Reader, stdout io.Writer) error {
-	var request CheckRequest
-
-	err := json.NewDecoder(stdin).Decode(&request)
-	if err != nil {
-		return fmt.Errorf("unable to parse JSON from stdin: %s", err.Error())
-	}
-
 	response := make(CheckResponse, 0)
-	if !request.Version.Timestamp.IsZero() {
-		response = append(response, request.Version)
-	}
-	response = append(response, internal.Version{
-		Timestamp: time.Now().Round(1 * time.Second),
-	})
-
-	err = json.NewEncoder(stdout).Encode(&response)
+	err := json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
 		return fmt.Errorf("unable to dump JSON to stdout: %s", err.Error())
 	}
