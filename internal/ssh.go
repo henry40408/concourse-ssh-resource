@@ -9,8 +9,11 @@ import (
 	easyssh "github.com/appleboy/easyssh-proxy"
 )
 
-const DefaultTimeout = 60 * 10 // = 10 minutes
+const defaultTimeout = 60 * 10 // = 10 minutes
 
+// PerformSSHCommand runs command on target machine via SSH.
+// It redirects content from stdout and stderr of comamnd on target machine and
+// returns error if anything goes wrong
 func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer) error {
 	config := &easyssh.MakeConfig{
 		Server:   source.Host,
@@ -24,7 +27,7 @@ func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer)
 		config.Port = strconv.Itoa(source.Port)
 	}
 
-	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(params.Script, DefaultTimeout)
+	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(params.Script, defaultTimeout)
 	if err != nil {
 		return fmt.Errorf("failed to run command: %s", err.Error())
 	}
