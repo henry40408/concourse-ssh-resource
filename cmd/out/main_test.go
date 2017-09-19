@@ -56,7 +56,7 @@ echo "%s"
 	stderrContent, err := io.ReadAll(mockio.ERR)
 	handleError(t, err)
 
-	assert.Equal(t, fmt.Sprintf("stdout: %s", words), string(stderrContent))
+	assert.Equal(t, fmt.Sprintf("stdout: %s\n", words), string(stderrContent))
 }
 
 func handleError(t *testing.T, err error) {
