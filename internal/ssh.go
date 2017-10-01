@@ -4,7 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
 	"strconv"
+	"time"
 
 	easyssh "github.com/appleboy/easyssh-proxy"
 )
@@ -12,8 +15,7 @@ import (
 const defaultTimeout = 60 * 10 // = 10 minutes
 
 // PerformSSHCommand runs command on target machine via SSH.
-// It redirects content from stdout and stderr of comamnd on target machine and
-// returns error if anything goes wrong
+// It puts script into file on target machine, and runs it with interpreter.
 func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer) error {
 	config := &easyssh.MakeConfig{
 		Server:   source.Host,
@@ -27,9 +29,20 @@ func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer)
 		config.Port = strconv.Itoa(source.Port)
 	}
 
-	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(params.Script, defaultTimeout)
+	interpreter := params.Interpreter
+	if interpreter == "" {
+		interpreter = "/bin/sh"
+	}
+
+	remoteScriptFileName, err := putScriptInLocalFile(config, params.Script)
 	if err != nil {
-		return fmt.Errorf("failed to run command: %s", err.Error())
+		return err
+	}
+
+	command := fmt.Sprintf("%s %s", interpreter, remoteScriptFileName)
+	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(command, defaultTimeout)
+	if err != nil {
+		return fmt.Errorf("failed to run script: %v", err)
 	}
 
 	done := true
@@ -48,7 +61,7 @@ loop:
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed when running SSH command: %s", err.Error())
+		return fmt.Errorf("failed when running SSH command: %v", err.Error())
 	}
 
 	if !done {
@@ -56,4 +69,23 @@ loop:
 	}
 
 	return nil
+}
+
+func putScriptInLocalFile(config *easyssh.MakeConfig, script string) (string, error) {
+	localScriptFile, err := ioutil.TempFile(os.TempDir(), "script")
+	if err != nil {
+		return "", fmt.Errorf("cannot create temporary file on local machine: %v", err)
+	}
+	defer localScriptFile.Close()
+
+	localScriptFile.WriteString(script)
+
+	remoteScriptFileName := fmt.Sprintf("/tmp/script%d", time.Now().Unix())
+
+	err = config.Scp(localScriptFile.Name(), remoteScriptFileName)
+	if err != nil {
+		return "", fmt.Errorf("failed to copy script to remote machine: %v", err)
+	}
+
+	return remoteScriptFileName, nil
 }

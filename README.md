@@ -4,11 +4,11 @@
 
 ## Source Configuration
 
-- `host`: host name of target machine
-- `port`: port of SSH server on target machine, `22` by default
-- `user`: user for executing shell script on target machine
-- `password`: plain password for user on target machine
-- `private_key`: private SSH key for user on target machine
+- `host`: host name of remote machine
+- `port`: port of SSH server on remote machine, `22` by default
+- `user`: user for executing shell script on remote machine
+- `password`: plain password for user on remote machine
+- `private_key`: private SSH key for user on remote machine
 
 According to [appleboy/easyssh-proxy](https://github.com/appleboy/easyssh-proxy/blob/b777a323265704a7015f3526c3fe31b4f0daa722/easyssh.go#L69-L105), if `password` and `private_key` both exist, `password` would be used first, then `private_key`.
 
@@ -18,11 +18,12 @@ This is a `put`-only resource, so `check` and `in` do nothing.
 
 ### `out`: Run commands via SSH
 
-Execute shell script on target machine via SSH.
+Execute shell script on remote machine via SSH.
 
 #### Parameters
 
-- `script`: string, shell script to run on target machine
+- `interpreter`: string, path to interpreter on remote machine, e.g. `/usr/bin/python3`, `/bin/sh` by default
+- `script`: string, shell script to run on remote machine
 
 ## Examples
 
@@ -47,9 +48,9 @@ jobs:
   plan:
   - put: staging-server
     params:
+      interpreter: /usr/bin/env python3
       script: |
-        #!/bin/sh
-        echo "Hello, world!"
+        print("Hello, world!")
 ```
 
 ## License

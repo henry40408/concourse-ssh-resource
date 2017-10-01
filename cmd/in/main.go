@@ -25,7 +25,7 @@ func Main(stdin io.Reader, stdout io.Writer) error {
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
-		return fmt.Errorf("unable to parse JSON from stdin: %s", err.Error())
+		return fmt.Errorf("unable to parse JSON from stdin: %v", err)
 	}
 
 	metadataItems := make([]internal.Metadata, 0)
@@ -35,7 +35,7 @@ func Main(stdin io.Reader, stdout io.Writer) error {
 	}
 	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return fmt.Errorf("failed to dump JSON to stdout: %s", err.Error())
+		return fmt.Errorf("failed to dump JSON to stdout: %v", err)
 	}
 
 	return nil

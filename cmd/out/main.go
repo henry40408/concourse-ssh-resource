@@ -34,7 +34,7 @@ func Main(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
-		return fmt.Errorf("unable to parse JSON from stdin: %s", err.Error())
+		return fmt.Errorf("unable to parse JSON from stdin: %v", err)
 	}
 
 	stdoutWriter := &prefixWriter{
@@ -49,7 +49,7 @@ func Main(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 
 	err = internal.PerformSSHCommand(&request.Source, &request.Params, stdoutWriter, stderrWriter)
 	if err != nil {
-		return fmt.Errorf("failed to run SSH command: %s", err.Error())
+		return fmt.Errorf("failed to run SSH command: %v", err)
 	}
 
 	metadataItems := make([]internal.Metadata, 0)
@@ -62,7 +62,7 @@ func Main(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 
 	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return fmt.Errorf("failed to dump JSON to stdout: %s", err.Error())
+		return fmt.Errorf("failed to dump JSON to stdout: %v", err)
 	}
 
 	return nil

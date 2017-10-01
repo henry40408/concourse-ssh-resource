@@ -4,7 +4,7 @@ jobs:
     working_directory: /go/src/github.com/henry40408/ssh-shell-resource
     docker:
       - image: circleci/golang:1.9
-      - image: quay.io/henry40408/alpine-ssh:v1.0.0
+      - image: quay.io/henry40408/alpine-ssh:v1.1.0
     steps:
       - checkout
       - run:
