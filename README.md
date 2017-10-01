@@ -14,7 +14,7 @@ According to [appleboy/easyssh-proxy](https://github.com/appleboy/easyssh-proxy/
 
 ## Behavior
 
-This is a `put`-only resource, so `check` and `in` do nothing.
+This is a `put`-only resource, `check` and `in` does nothing.
 
 ### `out`: Run commands via SSH
 
