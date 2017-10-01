@@ -20,7 +20,7 @@ func Main(stdin io.Reader, stdout io.Writer) error {
 	response := make(CheckResponse, 0)
 	err := json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return fmt.Errorf("unable to dump JSON to stdout: %s", err.Error())
+		return fmt.Errorf("unable to dump JSON to stdout: %v", err)
 	}
 
 	return nil
