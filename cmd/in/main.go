@@ -9,19 +9,19 @@ import (
 	"github.com/henry40408/ssh-shell-resource/internal"
 )
 
-type InRequest struct {
+type inRequest struct {
 	Source  internal.Source  `json:"source"`
 	Version internal.Version `json:"version"`
 	Params  internal.Params  `json:"params"`
 }
 
-type InResponse struct {
+type inResponse struct {
 	Version  internal.Version    `json:"version"`
 	Metadata []internal.Metadata `json:"metadata"`
 }
 
-func Main(stdin io.Reader, stdout io.Writer) error {
-	var request InRequest
+func inCommand(stdin io.Reader, stdout io.Writer) error {
+	var request inRequest
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
@@ -29,7 +29,7 @@ func Main(stdin io.Reader, stdout io.Writer) error {
 	}
 
 	metadataItems := make([]internal.Metadata, 0)
-	response := InResponse{
+	response := inResponse{
 		Version:  request.Version,
 		Metadata: metadataItems,
 	}
@@ -42,7 +42,7 @@ func Main(stdin io.Reader, stdout io.Writer) error {
 }
 
 func main() {
-	err := Main(os.Stdin, os.Stdout)
+	err := inCommand(os.Stdin, os.Stdout)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
