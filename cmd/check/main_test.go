@@ -2,40 +2,32 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"os"
-	"strings"
 	"testing"
+
+	"github.com/henry40408/ssh-shell-resource/pkg/mockio"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(t *testing.T) {
-	var response CheckResponse
+	var response checkResponse
 
-	stdout, err := ioutil.TempFile(os.TempDir(), "stdout")
-	handleError(t, err)
-	defer stdout.Close()
+	io, err := mockio.NewMockIO([]byte(`{ "source": {}, "version": {} }`))
+	captureError(t, err)
 
-	stdin := strings.NewReader(`{ "source": {}, "version": {} }`)
+	err = checkCommand(io.In, io.Out)
+	captureError(t, err)
 
-	err = Main(stdin, stdout)
-	handleError(t, err)
-
-	stdout.Seek(0, 0)
-	stdoutContent, err := ioutil.ReadAll(stdout)
-	handleError(t, err)
-
-	fmt.Printf(string(stdoutContent))
+	stdoutContent, err := io.ReadAll(mockio.OUT)
+	captureError(t, err)
 
 	err = json.Unmarshal(stdoutContent, &response)
-	handleError(t, err)
+	captureError(t, err)
 
 	assert.Equal(t, 0, len(response))
 }
 
-func handleError(t *testing.T, err error) {
+func captureError(t *testing.T, err error) {
 	if err != nil {
 		t.Error(err)
 	}
