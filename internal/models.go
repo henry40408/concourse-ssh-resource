@@ -21,7 +21,8 @@ type Version struct {
 // Params holds script so user can run multiple scripts on the same machine
 // in Concourse CI pipeline
 type Params struct {
-	Script string `json:"script"`
+	Interpreter string `json:"interpreter"`
+	Script      string `json:"script"`
 }
 
 // Metadata holds metadata from `in` and `out` command.
