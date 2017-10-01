@@ -2,7 +2,7 @@ package internal
 
 import "time"
 
-// Source holds information to connect target machine via SSH
+// Source holds information to connect remote machine via SSH
 type Source struct {
 	Host       string `json:"host"`
 	Port       int    `json:"port"`

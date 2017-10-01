@@ -10,27 +10,18 @@ import (
 	"github.com/henry40408/ssh-shell-resource/internal"
 )
 
-type OutRequest struct {
+type outRequest struct {
 	Params internal.Params `json:"params"`
 	Source internal.Source `json:"source"`
 }
 
-type OutResponse struct {
+type outResponse struct {
 	Version  internal.Version    `json:"version"`
 	Metadata []internal.Metadata `json:"metadata"`
 }
 
-type prefixWriter struct {
-	prefix string
-	writer io.Writer
-}
-
-func (pw *prefixWriter) Write(p []byte) (n int, err error) {
-	return fmt.Fprintf(pw.writer, "%s: %s", pw.prefix, p)
-}
-
-func Main(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
-	var request OutRequest
+func outCommand(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
+	var request outRequest
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
@@ -53,7 +44,7 @@ func Main(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 	}
 
 	metadataItems := make([]internal.Metadata, 0)
-	response := OutResponse{
+	response := outResponse{
 		Version: internal.Version{
 			Timestamp: time.Now().Round(1 * time.Second),
 		},
@@ -69,7 +60,7 @@ func Main(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 }
 
 func main() {
-	err := Main(os.Stdin, os.Stdout, os.Stderr)
+	err := outCommand(os.Stdin, os.Stdout, os.Stderr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)

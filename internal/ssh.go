@@ -14,8 +14,8 @@ import (
 
 const defaultTimeout = 60 * 10 // = 10 minutes
 
-// PerformSSHCommand runs command on target machine via SSH.
-// It puts script into file on target machine, and runs it with interpreter.
+// PerformSSHCommand runs command on remote machine via SSH.
+// It puts script into file on remote machine, and runs it with interpreter.
 func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer) error {
 	config := &easyssh.MakeConfig{
 		Server:   source.Host,

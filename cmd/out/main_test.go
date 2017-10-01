@@ -14,10 +14,10 @@ import (
 )
 
 func TestMain(t *testing.T) {
-	var response OutResponse
+	var response outResponse
 
 	words := fake.WordsN(3)
-	request := OutRequest{
+	request := outRequest{
 		Params: internal.Params{
 			Interpreter: "/bin/sh",
 			Script:      fmt.Sprintf(`echo "%s"`, words),
@@ -36,13 +36,12 @@ func TestMain(t *testing.T) {
 	handleError(t, err)
 	defer io.Cleanup()
 
-	err = Main(io.In, io.Out, io.Err)
+	err = outCommand(io.In, io.Out, io.Err)
 	handleError(t, err)
 
 	// test stdout
 	stdoutContent, err := io.ReadAll(mockio.OUT)
 	handleError(t, err)
-	fmt.Printf(string(stdoutContent))
 
 	err = json.Unmarshal(stdoutContent, &response)
 	handleError(t, err)
@@ -57,11 +56,11 @@ func TestMain(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("stdout: %s\n", words), string(stderrContent))
 }
 
-func TestMainWithPython(t *testing.T) {
-	var response OutResponse
+func TestMainWithInterpreter(t *testing.T) {
+	var response outResponse
 
 	words := fake.WordsN(3)
-	request := OutRequest{
+	request := outRequest{
 		Params: internal.Params{
 			Interpreter: "/usr/bin/python3",
 			Script:      fmt.Sprintf(`print("%s")`, words),
@@ -80,7 +79,7 @@ func TestMainWithPython(t *testing.T) {
 	handleError(t, err)
 	defer io.Cleanup()
 
-	err = Main(io.In, io.Out, io.Err)
+	err = outCommand(io.In, io.Out, io.Err)
 	handleError(t, err)
 
 	// test stdout

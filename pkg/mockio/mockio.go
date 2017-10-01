@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/spf13/afero"
 )
 
 const (
@@ -17,15 +19,17 @@ const (
 
 // MockIO holds three file to imitate stdin, stdout, and stderr
 type MockIO struct {
-	In  *os.File
-	Out *os.File
-	Err *os.File
+	In  afero.File
+	Out afero.File
+	Err afero.File
 }
 
 // NewMockIO returns new MockIO object. `content` would be write into stdin
 // so caller can read from it like ordinary stdin
 func NewMockIO(content []byte) (*MockIO, error) {
-	in, err := ioutil.TempFile(os.TempDir(), "stdin")
+	fs := afero.NewMemMapFs()
+
+	in, err := fs.Create("stdin")
 	if err != nil {
 		return nil, err
 	}
@@ -39,12 +43,12 @@ func NewMockIO(content []byte) (*MockIO, error) {
 	// resets cursor in stdin so caller can read it from the beginning
 	in.Seek(0, 0)
 
-	out, err := ioutil.TempFile(os.TempDir(), "stdout")
+	out, err := fs.Create("stdout")
 	if err != nil {
 		return nil, err
 	}
 
-	stdErr, err := ioutil.TempFile(os.TempDir(), "stderr")
+	stdErr, err := fs.Create("stderr")
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +78,7 @@ func (m *MockIO) ReadAll(flag int) ([]byte, error) {
 
 }
 
-func readAll(file *os.File) ([]byte, error) {
+func readAll(file afero.File) ([]byte, error) {
 	file.Seek(0, 0)
 
 	content, err := ioutil.ReadAll(file)
