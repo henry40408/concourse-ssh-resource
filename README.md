@@ -1,4 +1,4 @@
-# SSH Shell Resource [![CircleCI](https://circleci.com/gh/henry40408/ssh-shell-resource.svg?style=shield)](https://circleci.com/gh/henry40408/ssh-shell-resource) [![Docker Repository on Quay](https://quay.io/repository/henry40408/ssh-shell-resource/status "Docker Repository on Quay")](https://quay.io/repository/henry40408/ssh-shell-resource) [![GitHub release](https://img.shields.io/github/release/henry40408/ssh-shell-resource.svg)](https://github.com/henry40408/ssh-shell-resource) [![license](https://img.shields.io/github/license/henry40408/ssh-shell-resource.svg)](https://github.com/henry40408/ssh-shell-resource)
+# SSH Shell Resource [![CircleCI](https://circleci.com/gh/henry40408/ssh-shell-resource.svg?style=shield)](https://circleci.com/gh/henry40408/ssh-shell-resource) [![Docker Repository on Quay](https://quay.io/repository/henry40408/concourse-ssh-resource/status "Docker Repository on Quay")](https://quay.io/repository/henry40408/concourse-ssh-resource) [![GitHub release](https://img.shields.io/github/release/henry40408/ssh-shell-resource.svg)](https://github.com/henry40408/ssh-shell-resource) [![license](https://img.shields.io/github/license/henry40408/ssh-shell-resource.svg)](https://github.com/henry40408/ssh-shell-resource)
 
 > SSH shell resource for Concourse CI
 
@@ -33,7 +33,7 @@ resource_types:
 - name: ssh-shell
   type: docker-image
   source:
-    repository: quay.io/henry40408/ssh-shell-resource
+    repository: quay.io/henry40408/concourse-ssh-resource
 
 resources:
 - name: staging-server
