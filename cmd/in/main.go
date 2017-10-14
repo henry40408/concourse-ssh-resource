@@ -6,18 +6,18 @@ import (
 	"io"
 	"os"
 
-	"github.com/henry40408/ssh-shell-resource/internal"
+	"github.com/henry40408/concourse-ssh-resource/pkg"
 )
 
 type inRequest struct {
-	Source  internal.Source  `json:"source"`
-	Version internal.Version `json:"version"`
-	Params  internal.Params  `json:"params"`
+	Source  pkg.Source  `json:"source"`
+	Version pkg.Version `json:"version"`
+	Params  pkg.Params  `json:"params"`
 }
 
 type inResponse struct {
-	Version  internal.Version    `json:"version"`
-	Metadata []internal.Metadata `json:"metadata"`
+	Version  pkg.Version    `json:"version"`
+	Metadata []pkg.Metadata `json:"metadata"`
 }
 
 func inCommand(stdin io.Reader, stdout io.Writer) error {
@@ -28,7 +28,7 @@ func inCommand(stdin io.Reader, stdout io.Writer) error {
 		return fmt.Errorf("unable to parse JSON from stdin: %v", err)
 	}
 
-	metadataItems := make([]internal.Metadata, 0)
+	metadataItems := make([]pkg.Metadata, 0)
 	response := inResponse{
 		Version:  request.Version,
 		Metadata: metadataItems,

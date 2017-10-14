@@ -6,15 +6,15 @@ import (
 	"io"
 	"os"
 
-	"github.com/henry40408/ssh-shell-resource/internal"
+	"github.com/henry40408/concourse-ssh-resource/pkg"
 )
 
 type checkRequest struct {
-	Source  internal.Source  `json:"source"`
-	Version internal.Version `json:"version"`
+	Source  pkg.Source  `json:"source"`
+	Version pkg.Version `json:"version"`
 }
 
-type checkResponse []internal.Version
+type checkResponse []pkg.Version
 
 func checkCommand(stdin io.Reader, stdout io.Writer) error {
 	response := make(checkResponse, 0)
