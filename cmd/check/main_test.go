@@ -24,7 +24,8 @@ func TestMain(t *testing.T) {
 	err = json.Unmarshal(stdoutContent, &response)
 	captureError(t, err)
 
-	assert.Equal(t, 0, len(response))
+	assert.Equal(t, 1, len(response))
+	assert.True(t, response[0].Timestamp.IsZero())
 }
 
 func captureError(t *testing.T, err error) {
