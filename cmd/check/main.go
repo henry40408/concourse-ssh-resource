@@ -17,7 +17,11 @@ type checkRequest struct {
 type checkResponse []pkg.Version
 
 func checkCommand(stdin io.Reader, stdout io.Writer) error {
-	response := make(checkResponse, 0)
+	var response checkResponse
+
+	version := pkg.Version{}
+	response = append(response, version)
+
 	err := json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
 		return fmt.Errorf("unable to dump JSON to stdout: %v", err)
