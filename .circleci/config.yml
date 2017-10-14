@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/henry40408/concourse-shell-resource
+    working_directory: /go/src/github.com/henry40408/concourse-ssh-resource
     docker:
       - image: circleci/golang:1.9
       - image: quay.io/henry40408/alpine-ssh:v1.1.0
