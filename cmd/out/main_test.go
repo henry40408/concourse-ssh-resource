@@ -9,8 +9,8 @@ import (
 
 	"github.com/icrowley/fake"
 
-	"github.com/henry40408/ssh-shell-resource/internal"
-	"github.com/henry40408/ssh-shell-resource/pkg/mockio"
+	"github.com/henry40408/concourse-ssh-resource/pkg"
+	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
 
 func TestMain(t *testing.T) {
@@ -18,11 +18,11 @@ func TestMain(t *testing.T) {
 
 	words := fake.WordsN(3)
 	request := outRequest{
-		Params: internal.Params{
+		Params: pkg.Params{
 			Interpreter: "/bin/sh",
 			Script:      fmt.Sprintf(`echo "%s"`, words),
 		},
-		Source: internal.Source{
+		Source: pkg.Source{
 			Host:     "localhost",
 			User:     "root",
 			Password: "toor",
@@ -61,11 +61,11 @@ func TestMainWithInterpreter(t *testing.T) {
 
 	words := fake.WordsN(3)
 	request := outRequest{
-		Params: internal.Params{
+		Params: pkg.Params{
 			Interpreter: "/usr/bin/python3",
 			Script:      fmt.Sprintf(`print("%s")`, words),
 		},
-		Source: internal.Source{
+		Source: pkg.Source{
 			Host:     "localhost",
 			User:     "root",
 			Password: "toor",
