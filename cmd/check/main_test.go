@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/henry40408/ssh-shell-resource/pkg/mockio"
+	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 
 	"github.com/stretchr/testify/assert"
 )
