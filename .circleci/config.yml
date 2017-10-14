@@ -7,18 +7,12 @@ jobs:
       - image: quay.io/henry40408/alpine-ssh:v1.1.0
     steps:
       - checkout
-      - run:
-          name: Install govendor
-          command: go get -u github.com/kardianos/govendor
+      - run: go get -u github.com/kardianos/govendor
       - restore_cache:
           key: dependency-cache-{{ checksum "vendor/vendor.json" }}
-      - run:
-          name: Install Dependencies
-          command: govendor sync
+      - run: govendor sync
       - save_cache:
           key: dependency-cache-{{ checksum "vendor/vendor.json" }}
           paths:
             - ./vendor
-      - run:
-          name: Test
-          command: make test
+      - run: make test
