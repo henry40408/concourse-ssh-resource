@@ -1,6 +1,6 @@
 # Concourse SSH Resource [![CircleCI](https://circleci.com/gh/henry40408/concourse-ssh-resource.svg?style=shield)](https://circleci.com/gh/henry40408/concourse-ssh-resource) [![Docker Repository on Quay](https://quay.io/repository/henry40408/concourse-ssh-resource/status "Docker Repository on Quay")](https://quay.io/repository/henry40408/concourse-ssh-resource) [![GitHub release](https://img.shields.io/github/release/henry40408/concourse-ssh-resource.svg)](https://github.com/henry40408/concourse-ssh-resource) [![license](https://img.shields.io/github/license/henry40408/concourse-ssh-resource.svg)](https://github.com/henry40408/concourse-ssh-resource)
 
-> SSH shell resource for Concourse CI
+> SSH resource for Concourse CI
 
 ## Source Configuration
 
@@ -30,14 +30,14 @@ Execute shell script on remote machine via SSH.
 ```yaml
 ---
 resource_types:
-- name: ssh-shell
+- name: ssh
   type: docker-image
   source:
     repository: quay.io/henry40408/concourse-ssh-resource
 
 resources:
 - name: staging-server
-  type: ssh-shell
+  type: ssh
   source:
     host: 127.0.0.1
     user: root
