@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/henry40408/concourse-ssh-resource/pkg"
+	"github.com/henry40408/concourse-ssh-resource/internal"
 	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
 
@@ -14,13 +14,13 @@ func TestMain(t *testing.T) {
 	var response inResponse
 
 	request := inRequest{
-		Source: pkg.Source{
+		Source: internal.Source{
 			Host:     "localhost",
 			User:     "root",
 			Password: "toor",
 		},
-		Version: pkg.Version{},
-		Params:  pkg.Params{},
+		Version: internal.Version{},
+		Params:  internal.Params{},
 	}
 
 	requestJSON, err := json.Marshal(&request)
@@ -40,7 +40,7 @@ func TestMain(t *testing.T) {
 	handleError(t, err)
 
 	assert.Empty(t, response.Metadata)
-	assert.True(t, (pkg.Version{}) == response.Version)
+	assert.True(t, (internal.Version{}) == response.Version)
 }
 
 func handleError(t *testing.T, err error) {
