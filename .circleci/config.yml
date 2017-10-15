@@ -9,10 +9,11 @@ jobs:
       - checkout
       - run: go get -u github.com/kardianos/govendor
       - restore_cache:
-          key: dependency-cache-{{ checksum "vendor/vendor.json" }}
+          key: vendor-{{ checksum "vendor/vendor.json" }}
       - run: govendor sync
       - save_cache:
-          key: dependency-cache-{{ checksum "vendor/vendor.json" }}
+          key: vendor-{{ checksum "vendor/vendor.json" }}
           paths:
-            - ./vendor
+            - vendor
       - run: make test
+      - run: bash .circleci/codecov.sh

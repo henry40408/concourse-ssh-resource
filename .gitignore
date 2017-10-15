@@ -18,3 +18,5 @@
 
 vendor/*
 !vendor/vendor.json
+
+coverage.txt
