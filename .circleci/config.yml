@@ -15,4 +15,4 @@ jobs:
           key: dependency-cache-{{ checksum "vendor/vendor.json" }}
           paths:
             - ./vendor
-      - run: make test
+      - run: make test coverage
