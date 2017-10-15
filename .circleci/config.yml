@@ -15,4 +15,5 @@ jobs:
           key: dependency-cache-{{ checksum "vendor/vendor.json" }}
           paths:
             - ./vendor
-      - run: make test coverage
+      - run: make test
+      - run: bash <(curl -s https://codecov.io/bash)
