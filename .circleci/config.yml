@@ -15,5 +15,4 @@ jobs:
           key: vendor-{{ checksum "vendor/vendor.json" }}
           paths:
             - vendor
-      - run: make test
       - run: bash .circleci/codecov.sh
