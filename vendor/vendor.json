@@ -33,6 +33,12 @@
 			"revisionTime": "2016-01-10T10:55:54Z"
 		},
 		{
+			"checksumSHA1": "RQv5z2OLzrJOZsulJxvPxChZlN8=",
+			"path": "github.com/reconquest/hierr-go",
+			"revision": "7d09c0176fd2bb7fd71a4349d1253eef9edb2c5c",
+			"revisionTime": "2017-08-24T21:38:38Z"
+		},
+		{
 			"checksumSHA1": "uKUEGdjXcsvXZYmDeU6SUxe3n8M=",
 			"path": "github.com/spacemonkeygo/errors",
 			"revision": "fafb82d7319b7446027d97bda4b3e089160f6e79",
