@@ -23,27 +23,19 @@ func TestMain(t *testing.T) {
 	}
 
 	requestJSON, err := json.Marshal(&request)
-	handleError(t, err)
+	assert.NoError(t, err)
 
 	io, err := mockio.NewMockIO(requestJSON)
-	handleError(t, err)
+	assert.NoError(t, err)
 
 	err = inCommand(io.In, io.Out)
-	handleError(t, err)
+	assert.NoError(t, err)
 
 	// test stdout
-	responseJSON, err := io.ReadAll(mockio.OUT)
-	handleError(t, err)
-
-	err = json.Unmarshal(responseJSON, &response)
-	handleError(t, err)
+	io.Out.Seek(0, 0)
+	err = json.NewDecoder(io.Out).Decode(&response)
+	assert.NoError(t, err)
 
 	assert.Empty(t, response.Metadata)
-	assert.True(t, (models.Version{}) == response.Version)
-}
-
-func handleError(t *testing.T, err error) {
-	if err != nil {
-		t.Error(err)
-	}
+	assert.Equal(t, models.Version{}, response.Version)
 }

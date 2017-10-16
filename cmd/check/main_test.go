@@ -13,23 +13,15 @@ func TestMain(t *testing.T) {
 	var response checkResponse
 
 	io, err := mockio.NewMockIO([]byte(`{ "source": {}, "version": {} }`))
-	captureError(t, err)
+	assert.NoError(t, err)
 
 	err = checkCommand(io.In, io.Out)
-	captureError(t, err)
+	assert.NoError(t, err)
 
-	stdoutContent, err := io.ReadAll(mockio.OUT)
-	captureError(t, err)
-
-	err = json.Unmarshal(stdoutContent, &response)
-	captureError(t, err)
+	io.Out.Seek(0, 0)
+	err = json.NewDecoder(io.Out).Decode(&response)
+	assert.NoError(t, err)
 
 	assert.Equal(t, 1, len(response))
 	assert.True(t, response[0].Timestamp.IsZero())
-}
-
-func captureError(t *testing.T, err error) {
-	if err != nil {
-		t.Error(err)
-	}
 }
