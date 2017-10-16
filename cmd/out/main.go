@@ -7,18 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/henry40408/concourse-ssh-resource/internal"
+	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	"github.com/henry40408/concourse-ssh-resource/internal/ssh"
 )
-
-type outRequest struct {
-	Params internal.Params `json:"params"`
-	Source internal.Source `json:"source"`
-}
-
-type outResponse struct {
-	Version  internal.Version    `json:"version"`
-	Metadata []internal.Metadata `json:"metadata"`
-}
 
 func outCommand(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 	var request outRequest
@@ -38,14 +29,14 @@ func outCommand(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 		writer: stderr,
 	}
 
-	err = internal.PerformSSHCommand(&request.Source, &request.Params, stdoutWriter, stderrWriter)
+	err = ssh.PerformSSHCommand(&request.Source, &request.Params, stdoutWriter, stderrWriter)
 	if err != nil {
 		return fmt.Errorf("failed to run SSH command: %v", err)
 	}
 
-	metadataItems := make([]internal.Metadata, 0)
+	metadataItems := make([]models.Metadata, 0)
 	response := outResponse{
-		Version: internal.Version{
+		Version: models.Version{
 			Timestamp: time.Now().Round(1 * time.Second),
 		},
 		Metadata: metadataItems,

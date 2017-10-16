@@ -1,4 +1,4 @@
-package internal
+package ssh
 
 import (
 	"errors"
@@ -9,14 +9,16 @@ import (
 	"strconv"
 	"time"
 
-	easyssh "github.com/appleboy/easyssh-proxy"
+	"github.com/henry40408/concourse-ssh-resource/internal/models"
+
+	"github.com/appleboy/easyssh-proxy"
 )
 
 const defaultTimeout = 60 * 10 // = 10 minutes
 
 // PerformSSHCommand runs command on remote machine via SSH.
 // It puts script into file on remote machine, and runs it with interpreter.
-func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer) error {
+func PerformSSHCommand(source *models.Source, params *models.Params, stdout, stderr io.Writer) error {
 	config := &easyssh.MakeConfig{
 		Server:   source.Host,
 		Port:     "22",
@@ -73,10 +75,10 @@ loop:
 
 func putScriptInLocalFile(config *easyssh.MakeConfig, script string) (string, error) {
 	localScriptFile, err := ioutil.TempFile(os.TempDir(), "script")
+	defer localScriptFile.Close()
 	if err != nil {
 		return "", fmt.Errorf("cannot create temporary file on local machine: %v", err)
 	}
-	defer localScriptFile.Close()
 
 	localScriptFile.WriteString(script)
 

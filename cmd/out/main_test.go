@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 
 	"github.com/icrowley/fake"
-
-	"github.com/henry40408/concourse-ssh-resource/internal"
-	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(t *testing.T) {
@@ -18,11 +17,11 @@ func TestMain(t *testing.T) {
 
 	words := fake.WordsN(3)
 	request := outRequest{
-		Params: internal.Params{
+		Params: models.Params{
 			Interpreter: "/bin/sh",
 			Script:      fmt.Sprintf(`echo "%s"`, words),
 		},
-		Source: internal.Source{
+		Source: models.Source{
 			Host:     "localhost",
 			User:     "root",
 			Password: "toor",
@@ -33,8 +32,8 @@ func TestMain(t *testing.T) {
 	handleError(t, err)
 
 	io, err := mockio.NewMockIO(requestJSON)
-	handleError(t, err)
 	defer io.Cleanup()
+	handleError(t, err)
 
 	err = outCommand(io.In, io.Out, io.Err)
 	handleError(t, err)
@@ -61,11 +60,11 @@ func TestMainWithInterpreter(t *testing.T) {
 
 	words := fake.WordsN(3)
 	request := outRequest{
-		Params: internal.Params{
+		Params: models.Params{
 			Interpreter: "/usr/bin/python3",
 			Script:      fmt.Sprintf(`print("%s")`, words),
 		},
-		Source: internal.Source{
+		Source: models.Source{
 			Host:     "localhost",
 			User:     "root",
 			Password: "toor",
@@ -76,8 +75,8 @@ func TestMainWithInterpreter(t *testing.T) {
 	handleError(t, err)
 
 	io, err := mockio.NewMockIO(requestJSON)
-	handleError(t, err)
 	defer io.Cleanup()
+	handleError(t, err)
 
 	err = outCommand(io.In, io.Out, io.Err)
 	handleError(t, err)
