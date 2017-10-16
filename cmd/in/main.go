@@ -6,36 +6,26 @@ import (
 	"io"
 	"os"
 
-	"github.com/henry40408/concourse-ssh-resource/internal"
+	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	hierr "github.com/reconquest/hierr-go"
 )
-
-type inRequest struct {
-	Source  internal.Source  `json:"source"`
-	Version internal.Version `json:"version"`
-	Params  internal.Params  `json:"params"`
-}
-
-type inResponse struct {
-	Version  internal.Version    `json:"version"`
-	Metadata []internal.Metadata `json:"metadata"`
-}
 
 func inCommand(stdin io.Reader, stdout io.Writer) error {
 	var request inRequest
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
-		return fmt.Errorf("unable to parse JSON from stdin: %v", err)
+		return hierr.Errorf(err, "unable to parse JSON from stdin")
 	}
 
-	metadataItems := make([]internal.Metadata, 0)
+	metadataItems := make([]models.Metadata, 0)
 	response := inResponse{
 		Version:  request.Version,
 		Metadata: metadataItems,
 	}
 	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return fmt.Errorf("failed to dump JSON to stdout: %v", err)
+		return hierr.Errorf(err, "failed to dump JSON to stdout")
 	}
 
 	return nil

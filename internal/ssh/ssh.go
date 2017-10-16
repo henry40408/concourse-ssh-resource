@@ -1,4 +1,4 @@
-package internal
+package ssh
 
 import (
 	"errors"
@@ -9,14 +9,17 @@ import (
 	"strconv"
 	"time"
 
-	easyssh "github.com/appleboy/easyssh-proxy"
+	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	hierr "github.com/reconquest/hierr-go"
+
+	"github.com/appleboy/easyssh-proxy"
 )
 
 const defaultTimeout = 60 * 10 // = 10 minutes
 
 // PerformSSHCommand runs command on remote machine via SSH.
 // It puts script into file on remote machine, and runs it with interpreter.
-func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer) error {
+func PerformSSHCommand(source *models.Source, params *models.Params, stdout, stderr io.Writer) error {
 	config := &easyssh.MakeConfig{
 		Server:   source.Host,
 		Port:     "22",
@@ -42,7 +45,7 @@ func PerformSSHCommand(source *Source, params *Params, stdout, stderr io.Writer)
 	command := fmt.Sprintf("%s %s", interpreter, remoteScriptFileName)
 	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(command, defaultTimeout)
 	if err != nil {
-		return fmt.Errorf("failed to run script: %v", err)
+		return hierr.Errorf(err, "failed to run script on remote machine")
 	}
 
 	done := true
@@ -61,7 +64,7 @@ loop:
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed when running SSH command: %v", err.Error())
+		return hierr.Errorf(err, "failed when running SSH command on remote machine")
 	}
 
 	if !done {
@@ -73,10 +76,10 @@ loop:
 
 func putScriptInLocalFile(config *easyssh.MakeConfig, script string) (string, error) {
 	localScriptFile, err := ioutil.TempFile(os.TempDir(), "script")
-	if err != nil {
-		return "", fmt.Errorf("cannot create temporary file on local machine: %v", err)
-	}
 	defer localScriptFile.Close()
+	if err != nil {
+		return "", hierr.Errorf(err, "cannot create temporary file on local machine")
+	}
 
 	localScriptFile.WriteString(script)
 
@@ -84,7 +87,7 @@ func putScriptInLocalFile(config *easyssh.MakeConfig, script string) (string, er
 
 	err = config.Scp(localScriptFile.Name(), remoteScriptFileName)
 	if err != nil {
-		return "", fmt.Errorf("failed to copy script to remote machine: %v", err)
+		return "", hierr.Errorf(err, "failed to copy script to remote machine")
 	}
 
 	return remoteScriptFileName, nil

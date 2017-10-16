@@ -4,47 +4,38 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/henry40408/concourse-ssh-resource/internal"
+	"github.com/henry40408/concourse-ssh-resource/internal/models"
 	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(t *testing.T) {
 	var response inResponse
 
 	request := inRequest{
-		Source: internal.Source{
+		Source: models.Source{
 			Host:     "localhost",
 			User:     "root",
 			Password: "toor",
 		},
-		Version: internal.Version{},
-		Params:  internal.Params{},
+		Version: models.Version{},
+		Params:  models.Params{},
 	}
 
 	requestJSON, err := json.Marshal(&request)
-	handleError(t, err)
+	assert.NoError(t, err)
 
 	io, err := mockio.NewMockIO(requestJSON)
-	handleError(t, err)
+	assert.NoError(t, err)
 
 	err = inCommand(io.In, io.Out)
-	handleError(t, err)
+	assert.NoError(t, err)
 
 	// test stdout
-	responseJSON, err := io.ReadAll(mockio.OUT)
-	handleError(t, err)
-
-	err = json.Unmarshal(responseJSON, &response)
-	handleError(t, err)
+	io.Out.Seek(0, 0)
+	err = json.NewDecoder(io.Out).Decode(&response)
+	assert.NoError(t, err)
 
 	assert.Empty(t, response.Metadata)
-	assert.True(t, (internal.Version{}) == response.Version)
-}
-
-func handleError(t *testing.T, err error) {
-	if err != nil {
-		t.Error(err)
-	}
+	assert.Equal(t, models.Version{}, response.Version)
 }
