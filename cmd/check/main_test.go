@@ -23,5 +23,5 @@ func TestMain(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 1, len(response))
-	assert.True(t, response[0].Timestamp.IsZero())
+	assert.Zero(t, response[0].Timestamp)
 }
