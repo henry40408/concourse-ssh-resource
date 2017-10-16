@@ -12,7 +12,9 @@
 - `password`: plain password for user on remote machine
 - `private_key`: private SSH key for user on remote machine
 
-According to [appleboy/easyssh-proxy](https://github.com/appleboy/easyssh-proxy/blob/b777a323265704a7015f3526c3fe31b4f0daa722/easyssh.go#L69-L105), if `password` and `private_key` both exist, `password` would be used first, then `private_key`.
+### Caveats
+
+According to [appleboy/easyssh-proxy](https://github.com/appleboy/easyssh-proxy/blob/b777a323265704a7015f3526c3fe31b4f0daa722/easyssh.go#L69-L105), if `password` and `private_key` both exists, `password` would be used first, then `private_key`.
 
 ## Behavior
 
