@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	hierr "github.com/reconquest/hierr-go"
 )
 
 func checkCommand(stdin io.Reader, stdout io.Writer) error {
@@ -17,7 +18,7 @@ func checkCommand(stdin io.Reader, stdout io.Writer) error {
 
 	err := json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return fmt.Errorf("unable to dump JSON to stdout: %v", err)
+		return hierr.Errorf(err, "unable to dump JSON to stdout")
 	}
 
 	return nil

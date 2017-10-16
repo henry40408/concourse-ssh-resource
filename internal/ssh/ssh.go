@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	hierr "github.com/reconquest/hierr-go"
 
 	"github.com/appleboy/easyssh-proxy"
 )
@@ -44,7 +45,7 @@ func PerformSSHCommand(source *models.Source, params *models.Params, stdout, std
 	command := fmt.Sprintf("%s %s", interpreter, remoteScriptFileName)
 	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(command, defaultTimeout)
 	if err != nil {
-		return fmt.Errorf("failed to run script: %v", err)
+		return hierr.Errorf(err, "failed to run script on remote machine")
 	}
 
 	done := true
@@ -63,7 +64,7 @@ loop:
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed when running SSH command: %v", err.Error())
+		return hierr.Errorf(err, "failed when running SSH command on remote machine")
 	}
 
 	if !done {
@@ -77,7 +78,7 @@ func putScriptInLocalFile(config *easyssh.MakeConfig, script string) (string, er
 	localScriptFile, err := ioutil.TempFile(os.TempDir(), "script")
 	defer localScriptFile.Close()
 	if err != nil {
-		return "", fmt.Errorf("cannot create temporary file on local machine: %v", err)
+		return "", hierr.Errorf(err, "cannot create temporary file on local machine")
 	}
 
 	localScriptFile.WriteString(script)
@@ -86,7 +87,7 @@ func putScriptInLocalFile(config *easyssh.MakeConfig, script string) (string, er
 
 	err = config.Scp(localScriptFile.Name(), remoteScriptFileName)
 	if err != nil {
-		return "", fmt.Errorf("failed to copy script to remote machine: %v", err)
+		return "", hierr.Errorf(err, "failed to copy script to remote machine")
 	}
 
 	return remoteScriptFileName, nil

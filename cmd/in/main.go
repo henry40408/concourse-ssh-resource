@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	hierr "github.com/reconquest/hierr-go"
 )
 
 func inCommand(stdin io.Reader, stdout io.Writer) error {
@@ -14,7 +15,7 @@ func inCommand(stdin io.Reader, stdout io.Writer) error {
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
-		return fmt.Errorf("unable to parse JSON from stdin: %v", err)
+		return hierr.Errorf(err, "unable to parse JSON from stdin")
 	}
 
 	metadataItems := make([]models.Metadata, 0)
@@ -24,7 +25,7 @@ func inCommand(stdin io.Reader, stdout io.Writer) error {
 	}
 	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return fmt.Errorf("failed to dump JSON to stdout: %v", err)
+		return hierr.Errorf(err, "failed to dump JSON to stdout")
 	}
 
 	return nil

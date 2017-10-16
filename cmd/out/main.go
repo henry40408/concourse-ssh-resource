@@ -9,6 +9,7 @@ import (
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
 	"github.com/henry40408/concourse-ssh-resource/internal/ssh"
+	hierr "github.com/reconquest/hierr-go"
 )
 
 func outCommand(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
@@ -16,7 +17,7 @@ func outCommand(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
-		return fmt.Errorf("unable to parse JSON from stdin: %v", err)
+		return hierr.Errorf(err, "unable to parse JSON from stdin")
 	}
 
 	stdoutWriter := &prefixWriter{
@@ -31,7 +32,7 @@ func outCommand(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 
 	err = ssh.PerformSSHCommand(&request.Source, &request.Params, stdoutWriter, stderrWriter)
 	if err != nil {
-		return fmt.Errorf("failed to run SSH command: %v", err)
+		return hierr.Errorf(err, "failed to run SSH command")
 	}
 
 	metadataItems := make([]models.Metadata, 0)
@@ -44,7 +45,7 @@ func outCommand(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 
 	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return fmt.Errorf("failed to dump JSON to stdout: %v", err)
+		return hierr.Errorf(err, "failed to dump JSON to stdout")
 	}
 
 	return nil
