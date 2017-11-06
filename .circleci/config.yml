@@ -7,12 +7,4 @@ jobs:
       - image: quay.io/henry40408/alpine-ssh:v1.1.0
     steps:
       - checkout
-      - run: go get -u github.com/kardianos/govendor
-      - restore_cache:
-          key: vendor-{{ checksum "vendor/vendor.json" }}
-      - run: govendor sync
-      - save_cache:
-          key: vendor-{{ checksum "vendor/vendor.json" }}
-          paths:
-            - vendor
       - run: bash .circleci/codecov.sh
