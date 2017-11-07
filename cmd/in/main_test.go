@@ -4,28 +4,17 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/henry40408/concourse-ssh-resource/internal/models"
 	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(t *testing.T) {
-	var response inResponse
-
-	request := inRequest{
-		Source: models.Source{
-			Host:     "localhost",
-			User:     "root",
-			Password: "toor",
-		},
-		Version: models.Version{},
-		Params:  models.Params{},
+	var response struct {
+		Version  interface{}   `json:"version"`
+		Metadata []interface{} `json:"metadata"`
 	}
 
-	requestJSON, err := json.Marshal(&request)
-	assert.NoError(t, err)
-
-	io, err := mockio.NewMockIO(requestJSON)
+	io, err := mockio.NewMockIO([]byte(`{"source":{},"version":{}}`))
 	assert.NoError(t, err)
 
 	err = inCommand(io.In, io.Out)
@@ -36,6 +25,6 @@ func TestMain(t *testing.T) {
 	err = json.NewDecoder(io.Out).Decode(&response)
 	assert.NoError(t, err)
 
+	assert.Empty(t, response.Version)
 	assert.Empty(t, response.Metadata)
-	assert.Equal(t, models.Version{}, response.Version)
 }
