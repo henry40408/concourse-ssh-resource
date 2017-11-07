@@ -1,15 +1,11 @@
+//+build !test
+
 package main
 
 import (
 	"fmt"
-	"io"
 	"os"
 )
-
-func inCommand(stdin io.Reader, stdout io.Writer) error {
-	fmt.Fprintf(stdout, `{"version":{},"metadata":[]}`)
-	return nil
-}
 
 func main() {
 	err := inCommand(os.Stdin, os.Stdout)
