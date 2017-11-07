@@ -6,6 +6,6 @@ RUN apk --no-cache add make && \
     cd /go/src/github.com/henry40408/concourse-ssh-resource && \
     make build-linux && \
     rm -r /go && \
-    apk del make
+    apk --no-cache del make
 
 WORKDIR /opt/resource
