@@ -1,30 +1,36 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"testing"
 
-	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
 
 func TestMain(t *testing.T) {
-	var response struct {
-		Version  interface{}   `json:"version"`
-		Metadata []interface{} `json:"metadata"`
+	var response inResponse
+
+	reader := bytes.NewBuffer([]byte(`{"source":{},"version":{}}`))
+	io, err := mockio.NewMockIO(reader)
+	if !assert.NoError(t, err) {
+		return
 	}
 
-	io, err := mockio.NewMockIO([]byte(`{"source":{},"version":{}}`))
-	assert.NoError(t, err)
-
 	err = inCommand(io.In, io.Out)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
-	// test stdout
+	// test standard output
 	io.Out.Seek(0, 0)
 	err = json.NewDecoder(io.Out).Decode(&response)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
-	assert.Empty(t, response.Version)
+	assert.Empty(t, response.Version.Timestamp)
 	assert.Empty(t, response.Metadata)
 }

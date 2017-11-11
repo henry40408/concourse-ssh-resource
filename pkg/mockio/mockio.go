@@ -1,21 +1,23 @@
 package mockio
 
 import (
+	"io"
 	"os"
 
 	"github.com/spf13/afero"
 )
 
-// MockIO holds three file to imitate stdin, stdout, and stderr
+// MockIO holds three file to imitate standard input, standard output,
+// and standard error
 type MockIO struct {
 	In  afero.File
 	Out afero.File
 	Err afero.File
 }
 
-// NewMockIO returns new MockIO object. `content` would be write into stdin
-// so caller can read from it like ordinary stdin
-func NewMockIO(content []byte) (*MockIO, error) {
+// NewMockIO returns new MockIO object. Content in `reader` would be read into
+// standard input so caller can read from it like ordinary standard input
+func NewMockIO(reader io.Reader) (*MockIO, error) {
 	fs := afero.NewMemMapFs()
 
 	in, err := fs.Create("stdin")
@@ -23,13 +25,17 @@ func NewMockIO(content []byte) (*MockIO, error) {
 		return nil, err
 	}
 
-	// writes content into stdin
-	_, err = in.Write(content)
-	if err != nil {
-		return nil, err
+	buf := make([]byte, 8)
+	for {
+		_, err := reader.Read(buf)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, err
+		}
+		in.Write(buf)
 	}
-
-	// resets cursor in stdin so caller can read it from the beginning
 	in.Seek(0, 0)
 
 	out, err := fs.Create("stdout")

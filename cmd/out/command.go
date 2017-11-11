@@ -5,45 +5,47 @@ import (
 	"io"
 	"time"
 
+	hierr "github.com/reconquest/hierr-go"
+
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
 	"github.com/henry40408/concourse-ssh-resource/internal/ssh"
-	hierr "github.com/reconquest/hierr-go"
 )
 
-func outCommand(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
+type outRequest struct {
+	Params models.Params `json:"params"`
+	Source models.Source `json:"source"`
+}
+
+type outResponse struct {
+	Version  models.Version    `json:"version"`
+	Metadata []models.Metadata `json:"metadata"`
+}
+
+func outCommand(stdin io.Reader, stdout, stderr io.Writer) error {
 	var request outRequest
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
-		return hierr.Errorf(err, "unable to parse JSON from stdin")
+		return hierr.Errorf(err, "unable to parse JSON from standard input")
 	}
 
-	stdoutWriter := &prefixWriter{
-		prefix: "stdout",
-		writer: stderr,
-	}
-
-	stderrWriter := &prefixWriter{
-		prefix: "stderr",
-		writer: stderr,
-	}
-
-	err = ssh.PerformSSHCommand(&request.Source, &request.Params, stdoutWriter, stderrWriter)
+	outWriter := &prefixWriter{prefix: "STDOUT", writer: stderr}
+	errWriter := &prefixWriter{prefix: "STDERR", writer: stderr}
+	err = ssh.PerformSSHCommand(&request.Source, &request.Params, outWriter, errWriter)
 	if err != nil {
 		return hierr.Errorf(err, "failed to run SSH command")
 	}
 
-	metadataItems := make([]models.Metadata, 0)
 	response := outResponse{
 		Version: models.Version{
-			Timestamp: time.Now().Round(1 * time.Second),
+			Timestamp: time.Now().Format(time.RFC3339),
 		},
-		Metadata: metadataItems,
+		Metadata: make([]models.Metadata, 0),
 	}
 
 	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return hierr.Errorf(err, "failed to dump JSON to stdout")
+		return hierr.Errorf(err, "failed to dump JSON to standard output")
 	}
 
 	return nil
