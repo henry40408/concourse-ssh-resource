@@ -78,5 +78,5 @@ func TestCheckCommandWithMalformedJSON(t *testing.T) {
 
 	err = checkCommand(io.In, io.Out)
 	herr := err.(hierr.Error)
-	assert.Equal(t, herr.GetMessage(), "unable to parse JSON from standard input")
+	assert.Equal(t, "unable to parse JSON from standard input", herr.GetMessage())
 }
