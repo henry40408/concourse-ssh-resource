@@ -7,8 +7,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/henry40408/concourse-ssh-resource/internal/models"
 	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
+
+type inResponse struct {
+	Version  models.Version    `json:"version"`
+	Metadata []models.Metadata `json:"metadata"`
+}
 
 func TestInCommand(t *testing.T) {
 	var response inResponse

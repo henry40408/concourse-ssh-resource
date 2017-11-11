@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/reconquest/hierr-go"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
 	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckCommand(t *testing.T) {
@@ -66,4 +67,16 @@ func TestCheckCommandWithVersion(t *testing.T) {
 	if assert.Equal(t, 1, len(response)) {
 		assert.Equal(t, now, response[0].Timestamp)
 	}
+}
+
+func TestCheckCommandWithMalformedJSON(t *testing.T) {
+	io, err := mockio.NewMockIO(bytes.NewBuffer([]byte(`{`)))
+	defer io.Cleanup()
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	err = checkCommand(io.In, io.Out)
+	herr := err.(hierr.Error)
+	assert.Equal(t, herr.GetMessage(), "unable to parse JSON from standard input")
 }
