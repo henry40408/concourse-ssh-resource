@@ -8,13 +8,14 @@ import (
 	"testing"
 
 	"github.com/icrowley/fake"
+	"github.com/reconquest/hierr-go"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
 	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
 
-func TestMain(t *testing.T) {
+func TestOutCommand(t *testing.T) {
 	var response outResponse
 
 	words := fake.WordsN(3)
@@ -64,7 +65,7 @@ func TestMain(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("STDOUT: %s\n", words), string(stderrContent))
 }
 
-func TestMainWithInterpreter(t *testing.T) {
+func TestOutCommandWithInterpreter(t *testing.T) {
 	var response outResponse
 
 	words := fake.WordsN(3)
@@ -112,4 +113,43 @@ func TestMainWithInterpreter(t *testing.T) {
 	}
 
 	assert.Equal(t, fmt.Sprintf("STDOUT: %s\n", words), string(stderrContent))
+}
+
+func TestOutCommandWithMalformedJSON(t *testing.T) {
+	io, err := mockio.NewMockIO(bytes.NewBuffer([]byte("{")))
+	defer io.Cleanup()
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	err = outCommand(io.In, io.Out, io.Err)
+	herr := err.(hierr.Error)
+	assert.Equal(t, herr.GetMessage(), "unable to parse JSON from standard input")
+}
+
+func TestOutCommandWithBadConnectionInfo(t *testing.T) {
+	request, err := json.Marshal(&outRequest{
+		Params: models.Params{
+			Interpreter: "/bin/sh",
+			Script:      "uptime",
+		},
+		Source: models.Source{
+			Host:     "localhost",
+			User:     "root",
+			Password: "",
+		},
+	})
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	io, err := mockio.NewMockIO(bytes.NewBuffer(request))
+	defer io.Cleanup()
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	err = outCommand(io.In, io.Out, io.Err)
+	herr := err.(hierr.Error)
+	assert.Equal(t, herr.GetMessage(), "unable to run SSH command")
 }
