@@ -27,14 +27,14 @@ func NewMockIO(reader io.Reader) (*MockIO, error) {
 
 	buf := make([]byte, 8)
 	for {
-		_, err := reader.Read(buf)
+		n, err := reader.Read(buf)
 		if err != nil {
 			if err == io.EOF {
 				break
 			}
 			return nil, err
 		}
-		in.Write(buf)
+		in.Write(buf[:n])
 	}
 	in.Seek(0, 0)
 
