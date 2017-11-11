@@ -1,23 +1,24 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"testing"
 
-	"github.com/henry40408/concourse-ssh-resource/internal/models"
-	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
-
 	"github.com/icrowley/fake"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
 
 func TestMain(t *testing.T) {
 	var response outResponse
 
 	words := fake.WordsN(3)
-	request := outRequest{
+	request, err := json.Marshal(&outRequest{
 		Params: models.Params{
 			Interpreter: "/bin/sh",
 			Script:      fmt.Sprintf(`echo "%s"`, words),
@@ -27,39 +28,47 @@ func TestMain(t *testing.T) {
 			User:     "root",
 			Password: "toor",
 		},
+	})
+	if !assert.NoError(t, err) {
+		return
 	}
 
-	requestJSON, err := json.Marshal(&request)
-	assert.NoError(t, err)
-
-	io, err := mockio.NewMockIO(requestJSON)
+	io, err := mockio.NewMockIO(bytes.NewBuffer(request))
 	defer io.Cleanup()
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
 	err = outCommand(io.In, io.Out, io.Err)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
-	// test stdout
+	// test standard output
 	io.Out.Seek(0, 0)
 	err = json.NewDecoder(io.Out).Decode(&response)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
-	assert.False(t, response.Version.Timestamp.IsZero())
+	assert.NotEmpty(t, response.Version.Timestamp)
 	assert.Equal(t, 0, len(response.Metadata))
 
-	// test stderr
+	// test standard error
 	io.Err.Seek(0, 0)
 	stderrContent, err := ioutil.ReadAll(io.Err)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
-	assert.Equal(t, fmt.Sprintf("stdout: %s\n", words), string(stderrContent))
+	assert.Equal(t, fmt.Sprintf("STDOUT: %s\n", words), string(stderrContent))
 }
 
 func TestMainWithInterpreter(t *testing.T) {
 	var response outResponse
 
 	words := fake.WordsN(3)
-	request := outRequest{
+	request, err := json.Marshal(&outRequest{
 		Params: models.Params{
 			Interpreter: "/usr/bin/python3",
 			Script:      fmt.Sprintf(`print("%s")`, words),
@@ -69,30 +78,38 @@ func TestMainWithInterpreter(t *testing.T) {
 			User:     "root",
 			Password: "toor",
 		},
+	})
+	if !assert.NoError(t, err) {
+		return
 	}
 
-	requestJSON, err := json.Marshal(&request)
-	assert.NoError(t, err)
-
-	io, err := mockio.NewMockIO(requestJSON)
+	io, err := mockio.NewMockIO(bytes.NewBuffer(request))
 	defer io.Cleanup()
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
 	err = outCommand(io.In, io.Out, io.Err)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
-	// test stdout
+	// test standard output
 	io.Out.Seek(0, 0)
 	err = json.NewDecoder(io.Out).Decode(&response)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
-	assert.False(t, response.Version.Timestamp.IsZero())
+	assert.NotEmpty(t, response.Version.Timestamp)
 	assert.Equal(t, 0, len(response.Metadata))
 
-	// test stderr
+	// test standard error
 	io.Err.Seek(0, 0)
 	stderrContent, err := ioutil.ReadAll(io.Err)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
-	assert.Equal(t, fmt.Sprintf("stdout: %s\n", words), string(stderrContent))
+	assert.Equal(t, fmt.Sprintf("STDOUT: %s\n", words), string(stderrContent))
 }

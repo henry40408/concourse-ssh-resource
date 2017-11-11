@@ -1,7 +1,5 @@
 package models
 
-import "time"
-
 // Source holds information to connect remote machine via SSH
 type Source struct {
 	Host       string `json:"host"`
@@ -15,7 +13,7 @@ type Source struct {
 // whether to run the pipeline or not. Response from `out` command needs
 // it included to comply with Concourse specification
 type Version struct {
-	Timestamp time.Time `json:"time"`
+	Timestamp string `json:"time"`
 }
 
 // Params holds script so user can run multiple scripts on the same machine
