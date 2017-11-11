@@ -10,7 +10,7 @@ import (
 	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
 
-func TestMain(t *testing.T) {
+func TestInCommand(t *testing.T) {
 	var response inResponse
 
 	reader := bytes.NewBuffer([]byte(`{"source":{},"version":{}}`))
