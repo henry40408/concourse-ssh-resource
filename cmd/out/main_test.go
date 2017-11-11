@@ -18,7 +18,6 @@ func TestMain(t *testing.T) {
 	var response outResponse
 
 	words := fake.WordsN(3)
-
 	request, err := json.Marshal(&outRequest{
 		Params: models.Params{
 			Interpreter: "/bin/sh",
@@ -80,7 +79,9 @@ func TestMainWithInterpreter(t *testing.T) {
 			Password: "toor",
 		},
 	})
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		return
+	}
 
 	io, err := mockio.NewMockIO(bytes.NewBuffer(request))
 	defer io.Cleanup()

@@ -33,7 +33,7 @@ func outCommand(stdin io.Reader, stdout, stderr io.Writer) error {
 	errWriter := &prefixWriter{prefix: "STDERR", writer: stderr}
 	err = ssh.PerformSSHCommand(&request.Source, &request.Params, outWriter, errWriter)
 	if err != nil {
-		return hierr.Errorf(err, "failed to run SSH command")
+		return hierr.Errorf(err, "unable to run SSH command")
 	}
 
 	response := outResponse{
@@ -45,7 +45,7 @@ func outCommand(stdin io.Reader, stdout, stderr io.Writer) error {
 
 	err = json.NewEncoder(stdout).Encode(&response)
 	if err != nil {
-		return hierr.Errorf(err, "failed to dump JSON to standard output")
+		return hierr.Errorf(err, "unable to dump JSON to standard output")
 	}
 
 	return nil
