@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
-	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
 
 func TestOutCommand(t *testing.T) {
@@ -34,20 +33,16 @@ func TestOutCommand(t *testing.T) {
 		return
 	}
 
-	io, err := mockio.NewMockIO(bytes.NewBuffer(request))
-	defer io.Cleanup()
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	err = outCommand(io.In, io.Out, io.Err)
+	in := bytes.NewBuffer(request)
+	out := bytes.NewBuffer([]byte{})
+	stdErr := bytes.NewBuffer([]byte{})
+	err = outCommand(in, out, stdErr)
 	if !assert.NoError(t, err) {
 		return
 	}
 
 	// test standard output
-	io.Out.Seek(0, 0)
-	err = json.NewDecoder(io.Out).Decode(&response)
+	err = json.NewDecoder(out).Decode(&response)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -56,8 +51,7 @@ func TestOutCommand(t *testing.T) {
 	assert.Equal(t, 0, len(response.Metadata))
 
 	// test standard error
-	io.Err.Seek(0, 0)
-	stderrContent, err := ioutil.ReadAll(io.Err)
+	stderrContent, err := ioutil.ReadAll(stdErr)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -84,20 +78,16 @@ func TestOutCommandWithInterpreter(t *testing.T) {
 		return
 	}
 
-	io, err := mockio.NewMockIO(bytes.NewBuffer(request))
-	defer io.Cleanup()
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	err = outCommand(io.In, io.Out, io.Err)
+	in := bytes.NewBuffer(request)
+	out := bytes.NewBuffer([]byte{})
+	stdErr := bytes.NewBuffer([]byte{})
+	err = outCommand(in, out, stdErr)
 	if !assert.NoError(t, err) {
 		return
 	}
 
 	// test standard output
-	io.Out.Seek(0, 0)
-	err = json.NewDecoder(io.Out).Decode(&response)
+	err = json.NewDecoder(out).Decode(&response)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -106,23 +96,19 @@ func TestOutCommandWithInterpreter(t *testing.T) {
 	assert.Equal(t, 0, len(response.Metadata))
 
 	// test standard error
-	io.Err.Seek(0, 0)
-	stderrContent, err := ioutil.ReadAll(io.Err)
+	stderrContent, err := ioutil.ReadAll(stdErr)
 	if !assert.NoError(t, err) {
 		return
 	}
 
-	assert.Equal(t, fmt.Sprintf("STDOUT: %s\n", words), string(stderrContent))
+	assert.Equal(t, []byte(fmt.Sprintf("STDOUT: %s\n", words)), stderrContent)
 }
 
 func TestOutCommandWithMalformedJSON(t *testing.T) {
-	io, err := mockio.NewMockIO(bytes.NewBuffer([]byte("{")))
-	defer io.Cleanup()
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	err = outCommand(io.In, io.Out, io.Err)
+	in := bytes.NewBufferString(`{`)
+	out := bytes.NewBuffer([]byte{})
+	stdErr := bytes.NewBuffer([]byte{})
+	err := outCommand(in, out, stdErr)
 	herr := err.(hierr.Error)
 	assert.Equal(t, herr.GetMessage(), "unable to parse JSON from standard input")
 }
@@ -143,13 +129,11 @@ func TestOutCommandWithBadConnectionInfo(t *testing.T) {
 		return
 	}
 
-	io, err := mockio.NewMockIO(bytes.NewBuffer(request))
-	defer io.Cleanup()
-	if !assert.NoError(t, err) {
-		return
-	}
+	in := bytes.NewBuffer(request)
+	out := bytes.NewBuffer([]byte{})
+	stdErr := bytes.NewBuffer([]byte{})
 
-	err = outCommand(io.In, io.Out, io.Err)
+	err = outCommand(in, out, stdErr)
 	herr := err.(hierr.Error)
 	assert.Equal(t, herr.GetMessage(), "unable to run SSH command")
 }
