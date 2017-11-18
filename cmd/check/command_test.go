@@ -10,25 +10,19 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
-	"github.com/henry40408/concourse-ssh-resource/pkg/mockio"
 )
 
 func TestCheckCommand(t *testing.T) {
 	var response []models.Version
 
-	io, err := mockio.NewMockIO(bytes.NewBuffer([]byte(`{"source":{},"version":{}}`)))
-	defer io.Cleanup()
+	in := bytes.NewBufferString(`{"source":{},"version":{}}`)
+	out := bytes.NewBuffer([]byte{})
+	err := checkCommand(in, out)
 	if !assert.NoError(t, err) {
 		return
 	}
 
-	err = checkCommand(io.In, io.Out)
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	io.Out.Seek(0, 0)
-	err = json.NewDecoder(io.Out).Decode(&response)
+	err = json.NewDecoder(out).Decode(&response)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -47,19 +41,14 @@ func TestCheckCommandWithVersion(t *testing.T) {
 		return
 	}
 
-	io, err := mockio.NewMockIO(bytes.NewBuffer(requestJSON))
-	defer io.Cleanup()
+	in := bytes.NewBuffer(requestJSON)
+	out := bytes.NewBuffer([]byte{})
+	err = checkCommand(in, out)
 	if !assert.NoError(t, err) {
 		return
 	}
 
-	err = checkCommand(io.In, io.Out)
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	io.Out.Seek(0, 0)
-	err = json.NewDecoder(io.Out).Decode(&response)
+	err = json.NewDecoder(out).Decode(&response)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -70,13 +59,10 @@ func TestCheckCommandWithVersion(t *testing.T) {
 }
 
 func TestCheckCommandWithMalformedJSON(t *testing.T) {
-	io, err := mockio.NewMockIO(bytes.NewBuffer([]byte(`{`)))
-	defer io.Cleanup()
-	if !assert.NoError(t, err) {
-		return
-	}
+	in := bytes.NewBufferString(`{`)
+	out := bytes.NewBuffer([]byte{})
 
-	err = checkCommand(io.In, io.Out)
+	err := checkCommand(in, out)
 	herr := err.(hierr.Error)
 	assert.Equal(t, "unable to parse JSON from standard input", herr.GetMessage())
 }
