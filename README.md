@@ -80,6 +80,18 @@ jobs:
         print("Hello, world!")
 ```
 
+## Build
+
+Build yourself
+
+   docker-compose build . -t you/concourse-ssh-resource
+
+## Tests
+
+To run the test just do
+
+   docker-compose up
+
 ## License
 
 MIT

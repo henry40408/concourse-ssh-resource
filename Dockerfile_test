@@ -10,14 +10,16 @@ RUN apk --no-cache add make && \
 
 WORKDIR /opt/resource
 
-################ thats our production image
+################ thats our testing image
 
-FROM alpine:edge AS resource
+FROM alpine:edge AS test
+COPY tests/ /tests
 RUN apk --no-cache add \
   bash \
   curl \
   gzip \
   jq \
   tar \
-  openssl
+  openssl \
+  && chmod +x /tests/integration/*.sh
 COPY --from=builder /opt/resource /opt/resource
