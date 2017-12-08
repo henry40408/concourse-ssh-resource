@@ -21,6 +21,13 @@ type Version struct {
 type Params struct {
 	Interpreter string `json:"interpreter"`
 	Script      string `json:"script"`
+	Placeholders []Placeholder `json:"placeholders"`
+}
+
+type Placeholder struct {
+	Name string `json:"name"`
+	Value string `json:"value"`
+	File string `json:"file"`
 }
 
 // Metadata holds metadata from `in` and `out` command.

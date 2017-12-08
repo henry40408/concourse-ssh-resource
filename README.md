@@ -34,6 +34,23 @@ Execute shell script on remote machine via SSH.
 
 - `interpreter`: string, path to interpreter on remote machine, e.g. `/usr/bin/python3`, `/bin/sh` by default
 - `script`: string, shell script to run on remote machine
+- `placeholders`: Hashmap of `name` and either `value ` for a static value, or `file` for a dynamic value read from a file.
+  Every string matches `name` in your script defintion will then be replaced by either the `value` or the content of `file`
+
+Example
+```
+ - put: myserver
+   params:
+      interpreter: /usr/bin/env python3
+      script: |
+        echo "<MyPlaceHolder>"
+        echo "|dynamicPlaceHolder|"
+      placeholders:
+        - name: "<MyPlaceHolder>"
+          value: 'somevalue'
+        - name: "|dynamicPlaceHolder|"
+          file: "myresource/somefile"
+```
 
 ## Examples
 
