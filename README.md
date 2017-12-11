@@ -92,6 +92,12 @@ jobs:
           file: "bar"
 ```
 
+## Contributors
+
+> sorted in alphabetical order
+
+* [@EugenMayer](https://github.com/EugenMayer)
+
 ## License
 
 MIT
