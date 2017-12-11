@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 
-	hierr "github.com/reconquest/hierr-go"
+	"github.com/reconquest/hierr-go"
+	"github.com/spf13/afero"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
 	"github.com/henry40408/concourse-ssh-resource/internal/ssh"
@@ -21,8 +23,16 @@ type outResponse struct {
 	Metadata []models.Metadata `json:"metadata"`
 }
 
-func outCommand(stdin io.Reader, stdout, stderr io.Writer, baseDir string) error {
+func outCommand(fs afero.Fs, args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	var request outRequest
+
+	if len(args) < 2 {
+		return hierr.Error{
+			Message: fmt.Sprintf("need base directory, usage: %s <base directory>", args[0]),
+		}
+	}
+
+	baseDir := args[1]
 
 	err := json.NewDecoder(stdin).Decode(&request)
 	if err != nil {
@@ -31,7 +41,7 @@ func outCommand(stdin io.Reader, stdout, stderr io.Writer, baseDir string) error
 
 	outWriter := &prefixWriter{prefix: "STDOUT", writer: stderr}
 	errWriter := &prefixWriter{prefix: "STDERR", writer: stderr}
-	err = ssh.PerformSSHCommand(&request.Source, &request.Params, outWriter, errWriter, baseDir)
+	err = ssh.PerformSSHCommand(fs, &request.Source, &request.Params, outWriter, errWriter, baseDir)
 	if err != nil {
 		return hierr.Errorf(err, "unable to run SSH command")
 	}
