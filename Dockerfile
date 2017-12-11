@@ -14,7 +14,7 @@ WORKDIR /opt/resource
 
 # release stage
 
-FROM alpine:edge AS resource
+FROM alpine:edge
 
 RUN apk --no-cache add bash curl gzip jq tar openssl
 
