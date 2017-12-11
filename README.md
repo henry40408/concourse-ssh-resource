@@ -92,6 +92,15 @@ jobs:
           file: "bar"
 ```
 
+## How to Test
+
+We need to start a simple SSH server first. I assume there is no SSH server currently running on your laptop or workstation.
+
+For more information about the SSH server, please checkout [henry40408/alpine-ssh](https://github.com/henry40408/alpine-ssh).
+
+1. `docker run -d -p 22:22 quay.io/henry40408/alpine-ssh`
+2. `make test`
+
 ## Contributors
 
 > sorted in alphabetical order
