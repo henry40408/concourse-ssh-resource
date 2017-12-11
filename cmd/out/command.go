@@ -21,7 +21,7 @@ type outResponse struct {
 	Metadata []models.Metadata `json:"metadata"`
 }
 
-func outCommand(stdin io.Reader, stdout, stderr io.Writer) error {
+func outCommand(stdin io.Reader, stdout, stderr io.Writer, baseDir string) error {
 	var request outRequest
 
 	err := json.NewDecoder(stdin).Decode(&request)
@@ -31,7 +31,7 @@ func outCommand(stdin io.Reader, stdout, stderr io.Writer) error {
 
 	outWriter := &prefixWriter{prefix: "STDOUT", writer: stderr}
 	errWriter := &prefixWriter{prefix: "STDERR", writer: stderr}
-	err = ssh.PerformSSHCommand(&request.Source, &request.Params, outWriter, errWriter)
+	err = ssh.PerformSSHCommand(&request.Source, &request.Params, outWriter, errWriter, baseDir)
 	if err != nil {
 		return hierr.Errorf(err, "unable to run SSH command")
 	}

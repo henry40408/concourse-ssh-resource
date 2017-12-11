@@ -10,16 +10,19 @@ import (
 	"time"
 
 	"github.com/appleboy/easyssh-proxy"
-	hierr "github.com/reconquest/hierr-go"
+	"github.com/reconquest/hierr-go"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
+	"github.com/henry40408/concourse-ssh-resource/internal/utils"
+	"strings"
+	"path/filepath"
 )
 
 const defaultTimeout = 60 * 10 // = 10 minutes
 
 // PerformSSHCommand runs command on remote machine via SSH.
 // It puts script into file on remote machine, and runs it with interpreter.
-func PerformSSHCommand(source *models.Source, params *models.Params, stdout, stderr io.Writer) error {
+func PerformSSHCommand(source *models.Source, params *models.Params, stdout, stderr io.Writer, baseDir string) error {
 	config := &easyssh.MakeConfig{
 		Server:   source.Host,
 		Port:     "22",
@@ -36,11 +39,31 @@ func PerformSSHCommand(source *models.Source, params *models.Params, stdout, std
 	if interpreter == "" {
 		interpreter = "/bin/sh"
 	}
+	var script string = params.Script
+	// replacing all placeholders, either given as static value using .value or as dynamic using .file
+	for _, Placeholder := range params.Placeholders {
+		var value string = ""
+		// file should always be used if conflicting
+		if (Placeholder.File != "") {
+			// load from file
+			value = utils.ReadLineFromFile(filepath.Join(baseDir, Placeholder.File))
+		} else if ( Placeholder.Value != "" ) {
+			// static value
+			value = Placeholder.Value
+		}
 
-	remoteScriptFileName, err := putScriptInLocalFile(config, params.Script)
+		if strings.Contains(script, Placeholder.Name) {
+			script = strings.Replace(script, Placeholder.Name, value, -1)
+		} else {
+			// TODO: should we warn the user or exit 1 even if the pattern has not been found ( typo alert )
+		}
+	}
+
+	remoteScriptFileName, err := putScriptInLocalFile(config, script)
 	if err != nil {
 		return err
 	}
+
 
 	command := fmt.Sprintf("%s %s", interpreter, remoteScriptFileName)
 	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(command, defaultTimeout)

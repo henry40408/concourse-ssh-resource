@@ -1,0 +1,20 @@
+{
+  "source": {
+    "host": "openssh",
+    "user": "root",
+    "password": "root"
+  },
+  "params": {
+    "interpreter": "/bin/sh",
+    "script": "echo <CODE_VERSION>",
+    "placeholders": [
+      {
+        "name": "<CODE_VERSION>",
+        "value": "test_ok"
+      }
+    ]
+  },
+  "version": {
+    "ref": "0.5.0"
+  }
+}

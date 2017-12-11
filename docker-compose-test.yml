@@ -1,0 +1,10 @@
+version: "2"
+
+services:
+  openssh:
+    image: sickp/alpine-sshd
+  sshresource:
+    build:
+      context: .
+      dockerfile: Dockerfile_test
+    command: /tests/integration/all_tests.sh
