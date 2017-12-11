@@ -2,8 +2,6 @@
 
 FROM golang:alpine as builder
 
-ENV CGO_ENABLED 0
-
 COPY . /go/src/github.com/henry40408/concourse-ssh-resource
 
 RUN apk --no-cache add make && \
@@ -15,7 +13,5 @@ WORKDIR /opt/resource
 # release stage
 
 FROM alpine:edge
-
-RUN apk --no-cache add bash curl gzip jq tar openssl
 
 COPY --from=builder /opt/resource /opt/resource
