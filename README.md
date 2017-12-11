@@ -12,11 +12,11 @@
 
 ## Source Configuration
 
-- `host`: host name of remote machine
-- `port`: port of SSH server on remote machine, `22` by default
-- `user`: user for executing shell script on remote machine
-- `password`: plain password for user on remote machine
-- `private_key`: private SSH key for user on remote machine
+* `host`: host name of remote machine
+* `port`: port of SSH server on remote machine, `22` by default
+* `user`: user for executing shell script on remote machine
+* `password`: plain password for user on remote machine
+* `private_key`: private SSH key for user on remote machine
 
 ### Caveats
 
@@ -32,24 +32,23 @@ Execute shell script on remote machine via SSH.
 
 #### Parameters
 
-- `interpreter`: string, path to interpreter on remote machine, e.g. `/usr/bin/python3`, `/bin/sh` by default
-- `script`: string, shell script to run on remote machine
-- `placeholders`: Hashmap of `name` and either `value ` for a static value, or `file` for a dynamic value read from a file.
-  Every string matches `name` in your script defintion will then be replaced by either the `value` or the content of `file`
+* `interpreter`: string, path to interpreter on remote machine, e.g. `/usr/bin/python3`, `/bin/sh` by default
+* `script`: string, shell script to run on remote machine
+* `placeholders`: Map of `name` and either `value` for a static value, or `file` for a dynamic value read from a file. Every string matches `name` in your script defintion will then be replaced by either the `value` or the content of `file`. If `file` is used, **only the first line of file content would be used**. Example:
 
-Example
-```
- - put: myserver
-   params:
-      interpreter: /usr/bin/env python3
-      script: |
-        echo "<MyPlaceHolder>"
-        echo "|dynamicPlaceHolder|"
-      placeholders:
-        - name: "<MyPlaceHolder>"
-          value: 'somevalue'
-        - name: "|dynamicPlaceHolder|"
-          file: "myresource/somefile"
+```yaml
+---
+- put: myserver
+  params:
+    interpreter: /bin/sh
+    script: |
+      echo "<MyPlaceHolder>"
+      echo "|dynamicPlaceHolder|"
+    placeholders:
+      - name: "<MyPlaceHolder>"
+        value: "somevalue"
+      - name: "|dynamicPlaceHolder|"
+        file: "myresource/somefile"
 ```
 
 ## Examples
@@ -73,24 +72,25 @@ resources:
 jobs:
 - name: echo
   plan:
+  # Basic usage
   - put: staging-server
     params:
       interpreter: /usr/bin/env python3
       script: |
         print("Hello, world!")
+  # Placeholder usage
+  - put: staging-server
+    params:
+      interpreter: /bin/sh
+      script: |
+        echo "<static_value>"
+        echo "|dynamic_value|"
+      placeholders:
+        - name: "<static_value>"
+          value: "foo"
+        - name: "|dynamic_value|"
+          file: "bar"
 ```
-
-## Build
-
-Build yourself
-
-   docker-compose build . -t you/concourse-ssh-resource
-
-## Tests
-
-To run the test just do
-
-   docker-compose up
 
 ## License
 

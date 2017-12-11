@@ -24,11 +24,7 @@ type Params struct {
 	Placeholders []Placeholder `json:"placeholders"`
 }
 
-// Placeholder holds Name, Value and File.
-// Value and File are optional.
-// File is filename whose content would be used to replace placeholders in script field.
-// Value is primitive value which would be used to replace placeholders in script field.
-// When Value and File both exists at the same time, File would be used.
+// Placeholder holds Name and either Value for primitive value or File for file content.
 type Placeholder struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
