@@ -27,9 +27,7 @@ func outCommand(fs afero.Fs, args []string, stdin io.Reader, stdout, stderr io.W
 	var request outRequest
 
 	if len(args) < 2 {
-		return hierr.Error{
-			Message: fmt.Sprintf("need base directory, usage: %s <base directory>", args[0]),
-		}
+		return fmt.Errorf("need base directory, usage: %s <base directory>", args[0])
 	}
 
 	baseDir := args[1]
