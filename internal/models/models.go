@@ -24,7 +24,7 @@ type Params struct {
 	Placeholders []Placeholder `json:"placeholders"`
 }
 
-// Placeholder holds Name and either Value for primitive value or File for file content.
+// Placeholder holds Name and either Value for primitive value or File for file content
 type Placeholder struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
@@ -32,8 +32,7 @@ type Placeholder struct {
 }
 
 // Metadata holds metadata from `in` and `out` command.
-// Response from `out` command needs it included
-// to comply with Concourse specification
+// Response from `out` command needs it to comply with Concourse specification
 type Metadata struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
