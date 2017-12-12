@@ -46,7 +46,7 @@ func TestOutCommandWithValuePlaceholder(t *testing.T) {
 }
 
 func TestOutCommandWithFilePlaceholder(t *testing.T) {
-	args := []string{"out", "tmp"}
+	args := []string{"out", "/tmp"}
 	in := bytes.NewBufferString(`{
 		"source": {
 			"host": "localhost",
@@ -68,7 +68,7 @@ func TestOutCommandWithFilePlaceholder(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 	fs.MkdirAll("tmp", 0755)
-	afero.WriteFile(fs, "tmp/somefile", []byte("first_line\nsecond_line\nthird_line"), 0644)
+	afero.WriteFile(fs, "/tmp/somefile", []byte("first_line\nsecond_line\nthird_line"), 0644)
 
 	err := outCommand(fs, args, in, out, stdErr)
 	if !assert.NoError(t, err) {
