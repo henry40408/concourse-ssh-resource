@@ -41,12 +41,12 @@ func PerformSSHCommand(fs afero.Fs, source *models.Source, params *models.Params
 
 	script, err := placeholder.ReplacePlaceholders(fs, baseDir, params)
 	if err != nil {
-		return err
+		return hierr.Errorf(err, "unable to replace placeholders")
 	}
 
 	remoteScriptFileName, err := putScriptInLocalFile(config, script)
 	if err != nil {
-		return err
+		return hierr.Errorf(err, "unable to put script in file on local machine")
 	}
 
 	command := fmt.Sprintf("%s %s", interpreter, remoteScriptFileName)
