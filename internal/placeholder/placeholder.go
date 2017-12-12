@@ -3,7 +3,7 @@ package placeholder
 import (
 	"bufio"
 	"fmt"
-	"os"
+	"io"
 	"path/filepath"
 	"strings"
 
@@ -12,7 +12,7 @@ import (
 )
 
 // ReplacePlaceholders replaces placeholders in Script with Placeholders
-func ReplacePlaceholders(fs afero.Fs, baseDir string, params *models.Params) (string, error) {
+func ReplacePlaceholders(stderr io.Writer, fs afero.Fs, baseDir string, params *models.Params) (string, error) {
 	var err error
 
 	script := params.Script
@@ -37,13 +37,13 @@ func ReplacePlaceholders(fs afero.Fs, baseDir string, params *models.Params) (st
 			// static Value
 			value = placeholder.Value
 		} else {
-			fmt.Fprintf(os.Stderr, "WARNING: Neither File nor Value are set for placeholder '%s'", placeholder.Name)
+			fmt.Fprintf(stderr, "WARNING: Neither File nor Value are set for placeholder '%s'", placeholder.Name)
 		}
 
 		if strings.Contains(script, placeholder.Name) {
 			script = strings.Replace(script, placeholder.Name, value, -1)
 		} else {
-			fmt.Fprintf(os.Stderr, "WARNINIG: Placeholder '%s' is not found in script, maybe a typo?", placeholder.Name)
+			fmt.Fprintf(stderr, "WARNINIG: Placeholder '%s' is not found in script, maybe a typo?", placeholder.Name)
 		}
 	}
 

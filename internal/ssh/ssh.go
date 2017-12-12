@@ -39,7 +39,7 @@ func PerformSSHCommand(fs afero.Fs, source *models.Source, params *models.Params
 		interpreter = "/bin/sh"
 	}
 
-	script, err := placeholder.ReplacePlaceholders(fs, baseDir, params)
+	script, err := placeholder.ReplacePlaceholders(stderr, fs, baseDir, params)
 	if err != nil {
 		return hierr.Errorf(err, "unable to replace placeholders")
 	}
