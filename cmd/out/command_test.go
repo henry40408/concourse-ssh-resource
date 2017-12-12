@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/afero"
 
 	"github.com/icrowley/fake"
-	"github.com/reconquest/hierr-go"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
@@ -120,9 +119,7 @@ func TestOutCommandWithMalformedJSON(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 	err := outCommand(fs, args, in, out, stdErr)
-
-	herr := err.(hierr.Error)
-	assert.Equal(t, herr.GetMessage(), "unable to parse JSON from standard input")
+	assert.Contains(t, err.Error(), "unable to parse JSON from standard input")
 }
 
 func TestOutCommandWithBadConnectionInfo(t *testing.T) {
@@ -148,8 +145,7 @@ func TestOutCommandWithBadConnectionInfo(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 	err = outCommand(fs, args, in, out, stdErr)
-	herr := err.(hierr.Error)
-	assert.Equal(t, herr.GetMessage(), "unable to run SSH command")
+	assert.Contains(t, err.Error(), "unable to run SSH command")
 }
 
 func TestOutCommandWithNoBaseDirectory(t *testing.T) {
@@ -166,6 +162,5 @@ func TestOutCommandWithNoBaseDirectory(t *testing.T) {
 		return
 	}
 
-	herr := err.(hierr.Error)
-	assert.Equal(t, herr.Error(), "need base directory, usage: out <base directory>")
+	assert.Contains(t, err.Error(), "need base directory, usage: out <base directory>")
 }

@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/reconquest/hierr-go"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
@@ -63,6 +62,5 @@ func TestCheckCommandWithMalformedJSON(t *testing.T) {
 	out := bytes.NewBuffer([]byte{})
 
 	err := checkCommand(in, out)
-	herr := err.(hierr.Error)
-	assert.Equal(t, "unable to parse JSON from standard input", herr.GetMessage())
+	assert.Contains(t, err.Error(), "unable to parse JSON from standard input")
 }
