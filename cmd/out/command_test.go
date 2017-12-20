@@ -7,8 +7,9 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/spf13/afero"
+
 	"github.com/icrowley/fake"
-	"github.com/reconquest/hierr-go"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/henry40408/concourse-ssh-resource/internal/models"
@@ -33,10 +34,13 @@ func TestOutCommand(t *testing.T) {
 		return
 	}
 
+	args := []string{"out", "/tmp"}
 	in := bytes.NewBuffer(request)
 	out := bytes.NewBuffer([]byte{})
 	stdErr := bytes.NewBuffer([]byte{})
-	err = outCommand(in, out, stdErr)
+
+	fs := afero.NewMemMapFs()
+	err = outCommand(fs, args, in, out, stdErr)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -78,10 +82,13 @@ func TestOutCommandWithInterpreter(t *testing.T) {
 		return
 	}
 
+	args := []string{"out", "/tmp"}
 	in := bytes.NewBuffer(request)
 	out := bytes.NewBuffer([]byte{})
 	stdErr := bytes.NewBuffer([]byte{})
-	err = outCommand(in, out, stdErr)
+
+	fs := afero.NewMemMapFs()
+	err = outCommand(fs, args, in, out, stdErr)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -105,12 +112,14 @@ func TestOutCommandWithInterpreter(t *testing.T) {
 }
 
 func TestOutCommandWithMalformedJSON(t *testing.T) {
+	args := []string{"out", "/tmp"}
 	in := bytes.NewBufferString(`{`)
 	out := bytes.NewBuffer([]byte{})
 	stdErr := bytes.NewBuffer([]byte{})
-	err := outCommand(in, out, stdErr)
-	herr := err.(hierr.Error)
-	assert.Equal(t, herr.GetMessage(), "unable to parse JSON from standard input")
+
+	fs := afero.NewMemMapFs()
+	err := outCommand(fs, args, in, out, stdErr)
+	assert.Contains(t, err.Error(), "unable to parse JSON from standard input")
 }
 
 func TestOutCommandWithBadConnectionInfo(t *testing.T) {
@@ -129,11 +138,29 @@ func TestOutCommandWithBadConnectionInfo(t *testing.T) {
 		return
 	}
 
+	args := []string{"out", "/tmp"}
 	in := bytes.NewBuffer(request)
 	out := bytes.NewBuffer([]byte{})
 	stdErr := bytes.NewBuffer([]byte{})
 
-	err = outCommand(in, out, stdErr)
-	herr := err.(hierr.Error)
-	assert.Equal(t, herr.GetMessage(), "unable to run SSH command")
+	fs := afero.NewMemMapFs()
+	err = outCommand(fs, args, in, out, stdErr)
+	assert.Contains(t, err.Error(), "unable to run SSH command")
+}
+
+func TestOutCommandWithNoBaseDirectory(t *testing.T) {
+	args := []string{"out"}
+
+	in := bytes.NewBuffer([]byte{})
+	out := bytes.NewBuffer([]byte{})
+	stdErr := bytes.NewBuffer([]byte{})
+
+	fs := afero.NewMemMapFs()
+	err := outCommand(fs, args, in, out, stdErr)
+
+	if !assert.Error(t, err) {
+		return
+	}
+
+	assert.Contains(t, err.Error(), "need base directory, usage: out <base directory>")
 }

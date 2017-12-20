@@ -19,20 +19,20 @@ type Version struct {
 // Params holds script so user can run multiple scripts on the same machine
 // in Concourse CI pipeline
 type Params struct {
-	Interpreter string `json:"interpreter"`
-	Script      string `json:"script"`
+	Interpreter  string        `json:"interpreter"`
+	Script       string        `json:"script"`
 	Placeholders []Placeholder `json:"placeholders"`
 }
 
+// Placeholder holds Name and either Value for primitive value or File for file content
 type Placeholder struct {
-	Name string `json:"name"`
+	Name  string `json:"name"`
 	Value string `json:"value"`
-	File string `json:"file"`
+	File  string `json:"file"`
 }
 
 // Metadata holds metadata from `in` and `out` command.
-// Response from `out` command needs it included
-// to comply with Concourse specification
+// Response from `out` command needs it to comply with Concourse specification
 type Metadata struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
