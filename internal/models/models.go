@@ -7,6 +7,7 @@ type Source struct {
 	User       string `json:"user"`
 	Password   string `json:"password"`
 	PrivateKey string `json:"private_key"`
+	Timeout    int    `json:"timeout"`
 }
 
 // Version is breadcrumb for Concourse CI to choose
