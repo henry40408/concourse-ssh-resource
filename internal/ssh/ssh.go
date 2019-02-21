@@ -50,7 +50,11 @@ func PerformSSHCommand(fs afero.Fs, source *models.Source, params *models.Params
 	}
 
 	command := fmt.Sprintf("%s %s", interpreter, remoteScriptFileName)
-	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(command, defaultTimeout)
+	timeout := defaultTimeout
+	if source.Timeout != 0 {
+	    timeout = source.Timeout
+	}
+	stdoutChan, stderrChan, doneChan, errChan, err := config.Stream(command, timeout)
 	if err != nil {
 		return hierr.Errorf(err, "unable to run script on remote machine")
 	}
